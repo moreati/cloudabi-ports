@@ -1,0 +1,50 @@
+# Copyright (c) 2015 Nuxi, https://nuxi.nl/
+#
+# This file is distributed under a 2-clause BSD license.
+# See the LICENSE file for details.
+
+
+def build(ctx):
+    srcdir = ctx.extract('Python-%(version)s')
+    build = srcdir.autoconf([
+        '--build=x86_64-unknown-freebsd',
+        'ac_cv_buggy_getaddrinfo=no',
+        'ac_cv_file__dev_ptc=no',
+        'ac_cv_file__dev_ptmx=no',
+        'ac_cv_have_long_long_format=yes',
+    ])
+    with srcdir.diff('/home/edje/python.diff'):
+        build.debug_shell()
+    build.make()
+    build.make_install().install()
+
+package(
+    name='python',
+    version='3.5.1',
+    homepage='https://www.python.org/',
+    maintainer='info@nuxi.nl',
+    lib_depends={'c-runtime'},
+    build_cmd=build,
+)
+
+distfile(
+    name='Python-3.5.1.tar.xz',
+    checksum='c6d57c0c366d9060ab6c0cdf889ebf3d92711d466cc0119c441dbf2746f725c9',
+    master_sites={'https://www.python.org/ftp/python/3.5.1/'},
+    unsafe_string_sources={
+        'Modules/getpath.c',
+        'Modules/main.c',
+        'Objects/bytesobject.c',
+        'Objects/memoryobject.c',
+        'Objects/structseq.c',
+        'Objects/typeobject.c',
+        'Objects/unicodeobject.c',
+        'Parser/parsetok.c',
+        'Parser/parsetok.c',
+        'Parser/tokenizer.c',
+        'Parser/tokenizer.c',
+        'Python/codecs.c',
+        'Python/pystrtod.c',
+        'Python/traceback.c',
+    },
+)
