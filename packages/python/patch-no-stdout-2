@@ -1,0 +1,80 @@
+--- Parser/tokenizer.c
++++ Parser/tokenizer.c
+@@ -932,76 +932,7 @@
+             tok->inp = end;
+             return Py_CHARMASK(*tok->cur++);
+         }
+-        if (tok->prompt != NULL) {
+-            char *newtok = PyOS_Readline(stdin, stdout, tok->prompt);
+-#ifndef PGEN
+-            if (newtok != NULL) {
+-                char *translated = translate_newlines(newtok, 0, tok);
+-                PyMem_FREE(newtok);
+-                if (translated == NULL)
+-                    return EOF;
+-                newtok = translated;
+-            }
+-            if (tok->encoding && newtok && *newtok) {
+-                /* Recode to UTF-8 */
+-                Py_ssize_t buflen;
+-                const char* buf;
+-                PyObject *u = translate_into_utf8(newtok, tok->encoding);
+-                PyMem_FREE(newtok);
+-                if (!u) {
+-                    tok->done = E_DECODE;
+-                    return EOF;
+-                }
+-                buflen = PyBytes_GET_SIZE(u);
+-                buf = PyBytes_AS_STRING(u);
+-                newtok = PyMem_MALLOC(buflen+1);
+-                strcpy(newtok, buf);
+-                Py_DECREF(u);
+-            }
+-#endif
+-            if (tok->nextprompt != NULL)
+-                tok->prompt = tok->nextprompt;
+-            if (newtok == NULL)
+-                tok->done = E_INTR;
+-            else if (*newtok == '\0') {
+-                PyMem_FREE(newtok);
+-                tok->done = E_EOF;
+-            }
+-            else if (tok->start != NULL) {
+-                size_t start = tok->start - tok->buf;
+-                size_t oldlen = tok->cur - tok->buf;
+-                size_t newlen = oldlen + strlen(newtok);
+-                char *buf = tok->buf;
+-                buf = (char *)PyMem_REALLOC(buf, newlen+1);
+-                tok->lineno++;
+-                if (buf == NULL) {
+-                    PyMem_FREE(tok->buf);
+-                    tok->buf = NULL;
+-                    PyMem_FREE(newtok);
+-                    tok->done = E_NOMEM;
+-                    return EOF;
+-                }
+-                tok->buf = buf;
+-                tok->cur = tok->buf + oldlen;
+-                tok->line_start = tok->cur;
+-                strcpy(tok->buf + oldlen, newtok);
+-                PyMem_FREE(newtok);
+-                tok->inp = tok->buf + newlen;
+-                tok->end = tok->inp + 1;
+-                tok->start = tok->buf + start;
+-            }
+-            else {
+-                tok->lineno++;
+-                if (tok->buf != NULL)
+-                    PyMem_FREE(tok->buf);
+-                tok->buf = newtok;
+-                tok->cur = tok->buf;
+-                tok->line_start = tok->buf;
+-                tok->inp = strchr(tok->buf, '\0');
+-                tok->end = tok->inp + 1;
+-            }
+-        }
+-        else {
++        if (tok->prompt == NULL) {
+             int done = 0;
+             Py_ssize_t cur = 0;
+             char *pt;
