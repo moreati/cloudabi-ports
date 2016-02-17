@@ -1,0 +1,269 @@
+--- Include/pythread.h
++++ Include/pythread.h
+@@ -5,6 +5,12 @@
+ typedef void *PyThread_type_lock;
+ typedef void *PyThread_type_sema;
+ 
++#if !defined(__CloudABI__)
++typedef int PyThread_type_key;
++#else
++typedef intptr_t PyThread_type_key;
++#endif
++
+ #ifdef __cplusplus
+ extern "C" {
+ #endif
+@@ -77,11 +83,11 @@
+ PyAPI_FUNC(PyObject*) PyThread_GetInfo(void);
+ 
+ /* Thread Local Storage (TLS) API */
+-PyAPI_FUNC(int) PyThread_create_key(void);
+-PyAPI_FUNC(void) PyThread_delete_key(int);
+-PyAPI_FUNC(int) PyThread_set_key_value(int, void *);
+-PyAPI_FUNC(void *) PyThread_get_key_value(int);
+-PyAPI_FUNC(void) PyThread_delete_key_value(int key);
++PyAPI_FUNC(PyThread_type_key) PyThread_create_key(void);
++PyAPI_FUNC(void) PyThread_delete_key(PyThread_type_key);
++PyAPI_FUNC(int) PyThread_set_key_value(PyThread_type_key, void *);
++PyAPI_FUNC(void *) PyThread_get_key_value(PyThread_type_key);
++PyAPI_FUNC(void) PyThread_delete_key_value(PyThread_type_key key);
+ 
+ /* Cleanup after a fork */
+ PyAPI_FUNC(void) PyThread_ReInitTLS(void);
+--- Modules/_tracemalloc.c
++++ Modules/_tracemalloc.c
+@@ -143,7 +143,7 @@
+ #  error "need native thread local storage (TLS)"
+ #endif
+ 
+-static int tracemalloc_reentrant_key;
++static PyThread_type_key tracemalloc_reentrant_key;
+ 
+ /* Any non-NULL pointer can be used */
+ #define REENTRANT Py_True
+--- Python/pystate.c
++++ Python/pystate.c
+@@ -37,7 +37,7 @@
+    GILState implementation
+ */
+ static PyInterpreterState *autoInterpreterState = NULL;
+-static int autoTLSkey = 0;
++static PyThread_type_key autoTLSkey = 0;
+ #else
+ #define HEAD_INIT() /* Nothing */
+ #define HEAD_LOCK() /* Nothing */
+--- Python/thread.c
++++ Python/thread.c
+@@ -251,7 +251,7 @@
+  * this family, and callers must arrange to serialize calls to this
+  * function.  No violations are detected.
+  */
+-int
++PyThread_type_key
+ PyThread_create_key(void)
+ {
+     /* All parts of this function are wrong if it's called by multiple
+@@ -264,7 +264,7 @@
+ 
+ /* Forget the associations for key across *all* threads. */
+ void
+-PyThread_delete_key(int key)
++PyThread_delete_key(PyThread_type_key key)
+ {
+     struct key *p, **q;
+ 
+@@ -283,7 +283,7 @@
+ }
+ 
+ int
+-PyThread_set_key_value(int key, void *value)
++PyThread_set_key_value(PyThread_type_key key, void *value)
+ {
+     struct key *p;
+ 
+@@ -298,7 +298,7 @@
+  * if the current thread doesn't have an association for key.
+  */
+ void *
+-PyThread_get_key_value(int key)
++PyThread_get_key_value(PyThread_type_key key)
+ {
+     struct key *p = find_key(0, key, NULL);
+ 
+@@ -310,7 +310,7 @@
+ 
+ /* Forget the current thread's association for key, if any. */
+ void
+-PyThread_delete_key_value(int key)
++PyThread_delete_key_value(PyThread_type_key key)
+ {
+     long id = PyThread_get_thread_ident();
+     struct key *p, **q;
+--- Python/thread_foobar.h
++++ Python/thread_foobar.h
+@@ -85,7 +85,7 @@
+ #define Py_HAVE_NATIVE_TLS
+ 
+ #ifdef Py_HAVE_NATIVE_TLS
+-int
++PyThread_type_key
+ PyThread_create_key(void)
+ {
+     int result;
+@@ -93,13 +93,13 @@
+ }
+ 
+ void
+-PyThread_delete_key(int key)
++PyThread_delete_key(PyThread_type_key key)
+ {
+ 
+ }
+ 
+ int
+-PyThread_set_key_value(int key, void *value)
++PyThread_set_key_value(PyThread_type_key key, void *value)
+ {
+     int ok;
+ 
+@@ -110,7 +110,7 @@
+ }
+ 
+ void *
+-PyThread_get_key_value(int key)
++PyThread_get_key_value(PyThread_type_key key)
+ {
+     void *result;
+ 
+@@ -118,7 +118,7 @@
+ }
+ 
+ void
+-PyThread_delete_key_value(int key)
++PyThread_delete_key_value(PyThread_type_key key)
+ {
+ 
+ }
+--- Python/thread_nt.h
++++ Python/thread_nt.h
+@@ -374,23 +374,23 @@
+ #define Py_HAVE_NATIVE_TLS
+ 
+ #ifdef Py_HAVE_NATIVE_TLS
+-int
++PyThread_type_key
+ PyThread_create_key(void)
+ {
+     DWORD result= TlsAlloc();
+     if (result == TLS_OUT_OF_INDEXES)
+         return -1;
+-    return (int)result;
++    return (PyThread_type_key)result;
+ }
+ 
+ void
+-PyThread_delete_key(int key)
++PyThread_delete_key(PyThread_type_key key)
+ {
+     TlsFree(key);
+ }
+ 
+ int
+-PyThread_set_key_value(int key, void *value)
++PyThread_set_key_value(PyThread_type_key key, void *value)
+ {
+     BOOL ok;
+ 
+@@ -401,7 +401,7 @@
+ }
+ 
+ void *
+-PyThread_get_key_value(int key)
++PyThread_get_key_value(PyThread_type_key key)
+ {
+     /* because TLS is used in the Py_END_ALLOW_THREAD macro,
+      * it is necessary to preserve the windows error state, because
+@@ -416,7 +416,7 @@
+ }
+ 
+ void
+-PyThread_delete_key_value(int key)
++PyThread_delete_key_value(PyThread_type_key key)
+ {
+     /* NULL is used as "key missing", and it is also the default
+      * given by TlsGetValue() if nothing has been set yet.
+--- Python/thread_pthread.h
++++ Python/thread_pthread.h
+@@ -603,46 +603,66 @@
+ 
+ #define Py_HAVE_NATIVE_TLS
+ 
+-int
++PyThread_type_key
+ PyThread_create_key(void)
+ {
+     pthread_key_t key;
+     int fail = pthread_key_create(&key, NULL);
+     if (fail)
+         return -1;
++#if !defined(__CloudABI__)
+     if (key > INT_MAX) {
+         /* Issue #22206: handle integer overflow */
+         pthread_key_delete(key);
+         errno = ENOMEM;
+         return -1;
+     }
+-    return (int)key;
++    return (PyThread_type_key)key;
++#else
++    return (PyThread_type_key)&key;
++#endif
+ }
+ 
+ void
+-PyThread_delete_key(int key)
++PyThread_delete_key(PyThread_type_key key)
+ {
++#if !defined(__CloudABI__)
+     pthread_key_delete(key);
++#else
++    pthread_key_delete(*((pthread_key_t *) key));
++#endif
+ }
+ 
+ void
+-PyThread_delete_key_value(int key)
++PyThread_delete_key_value(PyThread_type_key key)
+ {
++#if !defined(__CloudABI__)
+     pthread_setspecific(key, NULL);
++#else
++    pthread_setspecific(*((pthread_key_t *) key), NULL);
++#endif
+ }
+ 
+ int
+-PyThread_set_key_value(int key, void *value)
++PyThread_set_key_value(PyThread_type_key key, void *value)
+ {
+     int fail;
++#if !defined(__CloudABI__)
+     fail = pthread_setspecific(key, value);
++#else
++    fail = pthread_setspecific(*((pthread_key_t *) key), value);
++#endif
+     return fail ? -1 : 0;
+ }
+ 
+ void *
+-PyThread_get_key_value(int key)
++PyThread_get_key_value(PyThread_type_key key)
+ {
++#if !defined(__CloudABI__)
+     return pthread_getspecific(key);
++#else
++    return pthread_getspecific(*((pthread_key_t *) key));
++#endif
+ }
+ 
+ void
