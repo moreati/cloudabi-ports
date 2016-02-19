@@ -1,0 +1,47 @@
+--- Modules/posixmodule.c
++++ Modules/posixmodule.c
+@@ -156,16 +156,10 @@
+ #define fsync _commit
+ #else
+ /* Unix functions that the configure script doesn't check for */
+-#define HAVE_EXECV      1
+ #define HAVE_FORK       1
+ #if defined(__USLC__) && defined(__SCO_VERSION__)       /* SCO UDK Compiler */
+ #define HAVE_FORK1      1
+ #endif
+-#define HAVE_GETEGID    1
+-#define HAVE_GETEUID    1
+-#define HAVE_GETGID     1
+-#define HAVE_GETPPID    1
+-#define HAVE_GETUID     1
+ #define HAVE_KILL       1
+ #define HAVE_OPENDIR    1
+ #define HAVE_PIPE       1
+@@ -401,6 +395,7 @@
+ 
+ 
+ #ifndef MS_WINDOWS
++# if !defined(HAVE_UID_T)
+ PyObject *
+ _PyLong_FromUid(uid_t uid)
+ {
+@@ -629,6 +624,7 @@
+     Py_DECREF(index);
+     return 0;
+ }
++# endif /* !defined(HAVE_UID_T) */
+ #endif /* MS_WINDOWS */
+ 
+ 
+@@ -2014,6 +2010,11 @@
+ #if defined(MS_WINDOWS)
+     PyStructSequence_SET_ITEM(v, 4, PyLong_FromLong(0));
+     PyStructSequence_SET_ITEM(v, 5, PyLong_FromLong(0));
++#elif !defined(HAVE_UID_T)
++    Py_INCREF(Py_None);
++    PyStructSequence_SET_ITEM(v, 4, Py_None);
++    Py_INCREF(Py_None);
++    PyStructSequence_SET_ITEM(v, 5, Py_None);
+ #else
+     PyStructSequence_SET_ITEM(v, 4, _PyLong_FromUid(st->st_uid));
+     PyStructSequence_SET_ITEM(v, 5, _PyLong_FromGid(st->st_gid));
