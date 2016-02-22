@@ -1,0 +1,15 @@
+--- Modules/pwdmodule.c
++++ Modules/pwdmodule.c
+@@ -4,6 +4,7 @@
+ #include "Python.h"
+ #include "posixmodule.h"
+ 
++#ifdef HAVE_PWD
+ #include <pwd.h>
+ 
+ #include "clinic/pwdmodule.c.h"
+@@ -236,3 +237,4 @@
+     PyModule_AddObject(m, "struct_passwd", (PyObject *) &StructPwdType);
+     return m;
+ }
++#endif /* HAVE_PWD */
