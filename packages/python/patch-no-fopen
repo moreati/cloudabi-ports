@@ -1,0 +1,141 @@
+--- Modules/getpath.c
++++ Modules/getpath.c
+@@ -429,7 +429,11 @@
+     exec_prefix[MAXPATHLEN] = L'\0';
+     joinpath(exec_prefix, L"pybuilddir.txt");
+     if (isfile(exec_prefix)) {
++#ifdef HAVE_FOPEN
+         FILE *f = _Py_wfopen(exec_prefix, L"rb");
++#else
++        FILE *f = NULL;
++#endif
+         if (f == NULL)
+             errno = 0;
+         else {
+@@ -668,13 +672,21 @@
+         wcscpy(tmpbuffer, argv0_path);
+ 
+         joinpath(tmpbuffer, env_cfg);
++#ifdef HAVE_FOPEN
+         env_file = _Py_wfopen(tmpbuffer, L"r");
++#else
++        env_file = NULL;
++#endif
+         if (env_file == NULL) {
+             errno = 0;
+             reduce(tmpbuffer);
+             reduce(tmpbuffer);
+             joinpath(tmpbuffer, env_cfg);
++#ifdef HAVE_FOPEN
+             env_file = _Py_wfopen(tmpbuffer, L"r");
++#else
++            env_file = NULL;
++#endif
+             if (env_file == NULL) {
+                 errno = 0;
+             }
+--- Modules/main.c
++++ Modules/main.c
+@@ -126,7 +126,11 @@
+ {
+     char *startup = Py_GETENV("PYTHONSTARTUP");
+     if (startup != NULL && startup[0] != '\0') {
++#ifdef HAVE_FOPEN
+         FILE *fp = _Py_fopen(startup, "r");
++#else
++        FILE *fp = NULL;
++#endif
+         if (fp != NULL) {
+             (void) PyRun_SimpleFileExFlags(fp, startup, 0, cf);
+             PyErr_Clear();
+@@ -705,7 +709,11 @@
+         }
+ 
+         if (sts==-1 && filename!=NULL) {
++#ifdef HAVE_FOPEN
+             fp = _Py_wfopen(filename, L"r");
++#else
++            fp = NULL;
++#endif
+             if (fp == NULL) {
+                 char *cfilename_buffer;
+                 const char *cfilename;
+--- Parser/pgenmain.c
++++ Parser/pgenmain.c
+@@ -53,16 +53,24 @@
+     graminit_h = argv[2];
+     graminit_c = argv[3];
+     g = getgrammar(filename);
++#ifdef HAVE_FOPEN
+     fp = fopen(graminit_c, "w");
++#else
++    fp = NULL;
++#endif
+     if (fp == NULL) {
+         perror(graminit_c);
+         Py_Exit(1);
+     }
+     if (Py_DebugFlag)
+         printf("Writing %s ...\n", graminit_c);
+     printgrammar(g, fp);
+     fclose(fp);
++#ifdef HAVE_FOPEN
+     fp = fopen(graminit_h, "w");
++#else
++    fp = NULL;
++#endif
+     if (fp == NULL) {
+         perror(graminit_h);
+         Py_Exit(1);
+@@ -79,7 +87,11 @@
+     grammar *g0, *g;
+     perrdetail err;
+ 
++#ifdef HAVE_FOPEN
+     fp = fopen(filename, "r");
++#else
++    fp = NULL;
++#endif
+     if (fp == NULL) {
+         perror(filename);
+         Py_Exit(1);
+--- Programs/_freeze_importlib.c
++++ Programs/_freeze_importlib.c
+@@ -49,7 +49,11 @@
+     }
+     inpath = argv[1];
+     outpath = argv[2];
++#ifdef HAVE_FOPEN
+     infile = fopen(inpath, "rb");
++#else
++    infile = NULL;
++#endif
+     if (infile == NULL) {
+         fprintf(stderr, "cannot open '%s' for reading\n", inpath);
+         goto error;
+@@ -106,7 +110,11 @@
+ 
+     /* Open the file in text mode. The hg checkout should be using the eol extension,
+        which in turn should cause the EOL style match the C library's text mode */
++#ifdef HAVE_FOPEN
+     outfile = fopen(outpath, "w");
++#else
++    outfile = NULL;
++#endif
+     if (outfile == NULL) {
+         fprintf(stderr, "cannot open '%s' for writing\n", outpath);
+         goto error;
+--- Python/pythonrun.c
++++ Python/pythonrun.c
+@@ -372,7 +372,11 @@
+         /* Try to run a pyc file. First, re-open in binary */
+         if (closeit)
+             fclose(fp);
++#ifdef HAVE_FOPEN
+         if ((pyc_fp = _Py_fopen(filename, "rb")) == NULL) {
++#else
++        if ((pyc_fp = NULL) == NULL) {
++#endif
+             fprintf(stderr, "python: Can't reopen .pyc file\n");
+             goto done;
+         }
