@@ -1,0 +1,10 @@
+--- Modules/posixmodule.c
++++ Modules/posixmodule.c
+@@ -165,7 +165,6 @@
+ #define HAVE_PIPE       1
+ #define HAVE_SYSTEM     1
+ #define HAVE_WAIT       1
+-#define HAVE_TTYNAME    1
+ #endif  /* _MSC_VER */
+ #endif  /* ! __WATCOMC__ || __QNX__ */
+ 
