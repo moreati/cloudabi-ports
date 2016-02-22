@@ -34,6 +34,7 @@ distfile(
     unsafe_string_sources={
         'Modules/getpath.c',
         'Modules/main.c',
+        'Modules/posixmodule.c',
         'Objects/bytesobject.c',
         'Objects/memoryobject.c',
         'Objects/structseq.c',
