@@ -1,0 +1,29 @@
+--- Modules/posixmodule.c
++++ Modules/posixmodule.c
+@@ -4338,7 +4338,7 @@
+ #endif
+ #endif /* HAVE_SYSTEM */
+ 
+-
++#ifdef HAVE_UMASK
+ /*[clinic input]
+ os.umask
+ 
+@@ -4357,6 +4357,7 @@
+         return posix_error();
+     return PyLong_FromLong((long)i);
+ }
++#endif /* HAVE_UMASK */
+ 
+ #ifdef MS_WINDOWS
+ 
+@@ -12271,7 +12272,9 @@
+     {"stat_float_times", stat_float_times, METH_VARARGS, stat_float_times__doc__},
+     OS_SYMLINK_METHODDEF
+     OS_SYSTEM_METHODDEF
++#ifdef HAVE_UMASK
+     OS_UMASK_METHODDEF
++#endif
+     OS_UNAME_METHODDEF
+     OS_UNLINK_METHODDEF
+     OS_REMOVE_METHODDEF
