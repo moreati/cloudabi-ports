@@ -1,11 +1,10 @@
 --- Modules/posixmodule.c
 +++ Modules/posixmodule.c
-@@ -156,16 +156,10 @@
+@@ -156,15 +156,9 @@
  #define fsync _commit
  #else
  /* Unix functions that the configure script doesn't check for */
 -#define HAVE_EXECV      1
- #define HAVE_FORK       1
  #if defined(__USLC__) && defined(__SCO_VERSION__)       /* SCO UDK Compiler */
  #define HAVE_FORK1      1
  #endif
@@ -14,9 +13,9 @@
 -#define HAVE_GETGID     1
 -#define HAVE_GETPPID    1
 -#define HAVE_GETUID     1
- #define HAVE_KILL       1
- #define HAVE_OPENDIR    1
  #define HAVE_PIPE       1
+ #define HAVE_SYSTEM     1
+ #define HAVE_WAIT       1
 @@ -401,6 +395,7 @@
  
  
