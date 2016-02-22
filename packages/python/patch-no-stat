@@ -1,0 +1,135 @@
+--- Modules/getpath.c
++++ Modules/getpath.c
+@@ -144,8 +144,13 @@
+         errno = EINVAL;
+         return -1;
+     }
++#ifdef HAVE_STAT
+     err = stat(fname, buf);
++#else
++    err = -23456;
++#endif
+     PyMem_Free(fname);
++    
+     return err;
+ }
+ 
+--- Modules/posixmodule.c
++++ Modules/posixmodule.c
+@@ -348,8 +348,12 @@
+ #       define FSTAT _Py_fstat_noraise
+ #       define STRUCT_STAT struct _Py_stat_struct
+ #else
++#   ifdef HAVE_STAT
+ #       define STAT stat
++#   endif
++#   ifdef HAVE_LSTAT
+ #       define LSTAT lstat
++#   endif
+ #       define FSTAT fstat
+ #       define STRUCT_STAT struct stat
+ #endif
+@@ -2141,7 +2145,11 @@
+                          follow_symlinks ? 0 : AT_SYMLINK_NOFOLLOW);
+     else
+ #endif
++#ifdef HAVE_STAT
+         result = STAT(path->narrow, &st);
++#else
++        result = -123456;
++#endif
+     Py_END_ALLOW_THREADS
+ 
+     if (result != 0) {
+@@ -11455,6 +11463,7 @@
+     return PyBool_FromLong(result);
+ }
+ 
++#if defined(MS_WINDOWS) || (defined(STAT) && defined(LSTAT))
+ static PyObject *
+ DirEntry_fetch_stat(DirEntry *self, int follow_symlinks)
+ {
+@@ -11543,6 +11552,7 @@
+ 
+     return DirEntry_get_stat(self, follow_symlinks);
+ }
++#endif /* defined(MS_WINDOWS) || (defined(STAT) && defined(LSTAT)) */
+ 
+ /* Set exception and return -1 on error, 0 for False, 1 for True */
+ static int
+@@ -11572,7 +11582,11 @@
+ #if defined(MS_WINDOWS) || defined(HAVE_DIRENT_D_TYPE)
+     if (need_stat) {
+ #endif
++#   if defined(MS_WINDOWS) || (defined(STAT) && defined(LSTAT))
+         stat = DirEntry_get_stat(self, follow_symlinks);
++#   else
++        stat = NULL;
++#   endif
+         if (!stat) {
+             if (PyErr_ExceptionMatches(PyExc_FileNotFoundError)) {
+                 /* If file doesn't exist (anymore), then return False
+@@ -11712,9 +11726,11 @@
+     {"is_symlink", (PyCFunction)DirEntry_py_is_symlink, METH_NOARGS,
+      "return True if the entry is a symbolic link; cached per entry"
+     },
++#if defined(MS_WINDOWS) || (defined(STAT) && defined(LSTAT))
+     {"stat", (PyCFunction)DirEntry_stat, METH_VARARGS | METH_KEYWORDS,
+      "return stat_result object for the entry; cached per entry"
+     },
++#endif
+     {"inode", (PyCFunction)DirEntry_inode, METH_NOARGS,
+      "return inode of the entry; cached per entry",
+     },
+--- Modules/Setup.dist
++++ Modules/Setup.dist
+@@ -126,9 +126,8 @@
+ # Standard I/O baseline
+ _io -I$(srcdir)/Modules/_io _io/_iomodule.c _io/iobase.c _io/fileio.c _io/bytesio.c _io/bufferedio.c _io/textio.c _io/stringio.c
+ 
+-# The zipimport module is always imported at startup. Having it as a
+-# builtin module avoids some bootstrapping problems and reduces overhead.
+-zipimport zipimport.c
++# The zipimport module is not supported on CloudABI, due to use of stat().
++# zipimport zipimport.c
+ 
+ # faulthandler module
+ faulthandler faulthandler.c
+--- Modules/zipimport.c
++++ Modules/zipimport.c
+@@ -4,6 +4,7 @@
+ #include "marshal.h"
+ #include <time.h>
+ 
++#ifdef HAVE_STAT
+ 
+ #define IS_SOURCE   0x0
+ #define IS_BYTECODE 0x1
+@@ -1508,3 +1509,5 @@
+         return NULL;
+     return mod;
+ }
++
++#endif /* HAVE_STAT */
+--- PC/config.c
++++ PC/config.c
+@@ -32,7 +32,9 @@
+ extern PyObject* PyInit__codecs(void);
+ extern PyObject* PyInit__weakref(void);
+ extern PyObject* PyInit_xxsubtype(void);
++#ifdef HAVE_STAT
+ extern PyObject* PyInit_zipimport(void);
++#endif
+ extern PyObject* PyInit__random(void);
+ extern PyObject* PyInit_itertools(void);
+ extern PyObject* PyInit__collections(void);
+@@ -128,7 +130,9 @@
+     {"_json", PyInit__json},
+ 
+     {"xxsubtype", PyInit_xxsubtype},
++#ifdef HAVE_STAT
+     {"zipimport", PyInit_zipimport},
++#endif
+     {"zlib", PyInit_zlib},
+ 
+     /* CJK codecs */
