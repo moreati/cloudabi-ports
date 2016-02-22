@@ -76,6 +76,51 @@
  
  #ifdef __cplusplus
  }
+--- Modules/_io/fileio.c
++++ Modules/_io/fileio.c
+@@ -392,7 +392,11 @@
+                     self->fd = _wopen(widename, flags, 0666);
+                 else
+ #endif
++#ifdef HAVE_OPEN
+                     self->fd = open(name, flags, 0666);
++#else
++                    self->fd = EMFILE;
++#endif /* HAVE_OPEN */
+                 Py_END_ALLOW_THREADS
+             } while (self->fd < 0 && errno == EINTR &&
+                      !(async_err = PyErr_CheckSignals()));
+--- Modules/posixmodule.c
++++ Modules/posixmodule.c
+@@ -7777,7 +7777,11 @@
+             fd = openat(dir_fd, path->narrow, flags, mode);
+         else
+ #endif
++#ifdef HAVE_OPEN
+             fd = open(path->narrow, flags, mode);
++#else
++            fd = ENFILE;
++#endif /* HAVE_OPEN */
+         Py_END_ALLOW_THREADS
+     } while (fd < 0 && errno == EINTR && !(async_err = PyErr_CheckSignals()));
+     _Py_END_SUPPRESS_IPH
+--- Python/errors.c
++++ Python/errors.c
+@@ -1021,12 +1021,14 @@
+         if (_PyObject_SetAttrId(v, &PyId_filename, filename))
+             PyErr_Clear();
+ 
++#ifdef HAVE_OPEN
+         tmp = PyErr_ProgramTextObject(filename, lineno);
+         if (tmp) {
+             if (_PyObject_SetAttrId(v, &PyId_text, tmp))
+                 PyErr_Clear();
+             Py_DECREF(tmp);
+         }
++#endif
+     }
+     if (_PyObject_SetAttrId(v, &PyId_offset, Py_None)) {
+         PyErr_Clear();
 --- Python/fileutils.c
 +++ Python/fileutils.c
 @@ -39,6 +39,7 @@
