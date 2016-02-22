@@ -1,0 +1,24 @@
+--- Modules/posixmodule.c
++++ Modules/posixmodule.c
+@@ -203,7 +203,9 @@
+ #endif
+ extern int rmdir(const char *);
+ #endif
++#ifdef HAVE_CHMOD
+ extern int chmod(const char *, mode_t);
++#endif
+ /*#ifdef HAVE_FCHMOD
+ extern int fchmod(int, mode_t);
+ #endif*/
+@@ -2878,7 +2880,11 @@
+     }
+     else
+ #endif
++#ifdef HAVE_CHMOD
+         result = chmod(path->narrow, mode);
++#else
++        result= -9999;
++#endif /* HAVE_CHMOD */
+     Py_END_ALLOW_THREADS
+ 
+     if (result) {
