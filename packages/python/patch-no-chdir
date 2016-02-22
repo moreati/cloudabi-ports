@@ -1,0 +1,24 @@
+--- Modules/posixmodule.c
++++ Modules/posixmodule.c
+@@ -198,7 +198,9 @@
+ extern int chdir(char *);
+ extern int rmdir(char *);
+ #else
++#ifdef HAVE_CHDIR
+ extern int chdir(const char *);
++#endif
+ extern int rmdir(const char *);
+ #endif
+ extern int chmod(const char *, mode_t);
+@@ -2726,7 +2728,11 @@
+         result = fchdir(path->fd);
+     else
+ #endif
++#ifdef HAVE_CHDIR
+         result = chdir(path->narrow);
++#else
++        result = -3456;
++#endif
+ #endif
+     Py_END_ALLOW_THREADS
+ 
