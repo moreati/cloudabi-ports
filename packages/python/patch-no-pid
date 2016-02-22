@@ -1,0 +1,51 @@
+--- Modules/posixmodule.c
++++ Modules/posixmodule.c
+@@ -6036,7 +6036,7 @@
+ }
+ #endif /* HAVE_GETGID */
+ 
+-
++#ifdef HAVE_PID
+ /*[clinic input]
+ os.getpid
+ 
+@@ -6049,6 +6049,7 @@
+ {
+     return PyLong_FromPid(getpid());
+ }
++#endif
+ 
+ #ifdef HAVE_GETGROUPLIST
+ 
+--- Modules/signalmodule.c
++++ Modules/signalmodule.c
+@@ -89,7 +89,9 @@
+ #include <sys/types.h> /* For pid_t */
+ #include "pythread.h"
+ static long main_thread;
++# ifdef WITH_PID
+ static pid_t main_pid;
++# endif
+ #endif
+ 
+ #ifdef HAVE_SIG_ATOMIC_T
+@@ -1216,7 +1218,9 @@
+ 
+ #ifdef WITH_THREAD
+     main_thread = PyThread_get_thread_ident();
++# ifdef WITH_PID
+     main_pid = getpid();
++# endif
+ #endif
+ 
+     /* Create the module and add the functions */
+@@ -1688,7 +1692,9 @@
+     _PyGILState_Reinit();
+     PyEval_ReInitThreads();
+     main_thread = PyThread_get_thread_ident();
++# ifdef WITH_PID
+     main_pid = getpid();
++# endif
+     _PyImport_ReInitLock();
+ #endif
+ }
