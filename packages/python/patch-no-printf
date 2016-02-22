@@ -1,0 +1,115 @@
+--- Modules/main.c
++++ Modules/main.c
+@@ -503,7 +503,7 @@
+         return usage(0, argv[0]);
+ 
+     if (version) {
+-        printf("Python %s\n", PY_VERSION);
++        fprintf(stderr, "Python %s\n", PY_VERSION);
+         return 0;
+     }
+ 
+--- Parser/pgen.c
++++ Parser/pgen.c
+@@ -153,8 +153,6 @@
+     nfagrammar *gr;
+     int i;
+ 
+-    if (Py_DebugFlag)
+-        printf("Compiling (meta-) parse tree into NFA grammar\n");
+     gr = newnfagrammar();
+     REQ(n, MSTART);
+     i = n->n_nchildren - 1; /* Last child is ENDMARKER */
+@@ -311,7 +309,7 @@
+     int i;
+     nfaarc *ar;
+ 
+-    printf("%c%2d%c",
++    fprintf(stderr, "%c%2d%c",
+         istate == nf->nf_start ? '*' : ' ',
+         istate,
+         istate == nf->nf_finish ? '.' : ' ');
+@@ -319,12 +317,12 @@
+     ar = st->st_arc;
+     for (i = 0; i < st->st_narcs; i++) {
+         if (i > 0)
+-            printf("\n    ");
+-        printf("-> %2d  %s", ar->ar_arrow,
++            fprintf(stderr, "\n    ");
++        fprintf(stderr, "-> %2d  %s", ar->ar_arrow,
+             PyGrammar_LabelRepr(&ll->ll_label[ar->ar_label]));
+         ar++;
+     }
+-    printf("\n");
++    fprintf(stderr, "\n");
+ }
+ 
+ static void
+@@ -332,7 +330,7 @@
+ {
+     int i;
+ 
+-    printf("NFA '%s' has %d states; start %d, finish %d\n",
++    fprintf(stderr, "NFA '%s' has %d states; start %d, finish %d\n",
+         nf->nf_name, nf->nf_nstates, nf->nf_start, nf->nf_finish);
+     for (i = 0; i < nf->nf_nstates; i++)
+         dumpstate(ll, nf, i);
+@@ -408,7 +406,7 @@
+     yy->ss_deleted = 0;
+     yy->ss_finish = testbit(ss, nf->nf_finish);
+     if (yy->ss_finish)
+-        printf("Error: nonterminal '%s' may produce empty.\n",
++        fprintf(stderr, "Error: nonterminal '%s' may produce empty.\n",
+             nf->nf_name);
+ 
+     /* This algorithm is from a book written before
+@@ -500,23 +498,23 @@
+     ss_state *yy;
+     ss_arc *zz;
+ 
+-    printf("Subset DFA %s\n", msg);
++    fprintf(stderr, "Subset DFA %s\n", msg);
+     for (i = 0; i < xx_nstates; i++) {
+         yy = &xx_state[i];
+         if (yy->ss_deleted)
+             continue;
+-        printf(" Subset %d", i);
++        fprintf(stderr, " Subset %d", i);
+         if (yy->ss_finish)
+-            printf(" (finish)");
+-        printf(" { ");
++            fprintf(stderr, " (finish)");
++        fprintf(stderr, " { ");
+         for (ibit = 0; ibit < nbits; ibit++) {
+             if (testbit(yy->ss_ss, ibit))
+-                printf("%d ", ibit);
++                fprintf(stderr, "%d ", ibit);
+         }
+-        printf("}\n");
++        fprintf(stderr, "}\n");
+         for (iarc = 0; iarc < yy->ss_narcs; iarc++) {
+             zz = &yy->ss_arc[iarc];
+-            printf("  Arc to state %d, label %s\n",
++            fprintf(stderr, "  Arc to state %d, label %s\n",
+                 zz->sa_arrow,
+                 PyGrammar_LabelRepr(
+                     &ll->ll_label[zz->sa_label]));
+@@ -554,8 +552,6 @@
+ {
+     int i, j;
+ 
+-    if (Py_DebugFlag)
+-        printf("Rename state %d to %d.\n", from, to);
+     for (i = 0; i < xx_nstates; i++) {
+         if (xx_state[i].ss_deleted)
+             continue;
+@@ -648,9 +644,7 @@
+     for (i = 0; i < gr->gr_nnfas; i++) {
+         nf = gr->gr_nfa[i];
+         if (Py_DebugFlag) {
+-            printf("Dump of NFA for '%s' ...\n", nf->nf_name);
+             dumpnfa(&gr->gr_ll, nf);
+-            printf("Making DFA for '%s' ...\n", nf->nf_name);
+         }
+         d = adddfa(g, nf->nf_type, nf->nf_name);
+         makedfa(gr, gr->gr_nfa[i], d);
