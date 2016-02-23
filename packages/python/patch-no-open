@@ -121,6 +121,34 @@
      }
      if (_PyObject_SetAttrId(v, &PyId_offset, Py_None)) {
          PyErr_Clear();
+--- Python/ast.c
++++ Python/ast.c
+@@ -601,7 +601,11 @@
+ {
+     PyObject *value, *errstr, *loc, *tmp;
+ 
++#ifdef HAVE_OPEN
+     loc = PyErr_ProgramTextObject(c->c_filename, LINENO(n));
++#else
++    loc = NULL;
++#endif
+     if (!loc) {
+         Py_INCREF(Py_None);
+         loc = Py_None;
+--- Python/compile.c
++++ Python/compile.c
+@@ -4056,7 +4056,11 @@
+     PyObject *loc;
+     PyObject *u = NULL, *v = NULL;
+ 
++#ifdef HAVE_OPEN
+     loc = PyErr_ProgramTextObject(c->c_filename, c->u->u_lineno);
++#else
++    loc = NULL;
++#endif
+     if (!loc) {
+         Py_INCREF(Py_None);
+         loc = Py_None;
 --- Python/fileutils.c
 +++ Python/fileutils.c
 @@ -39,6 +39,7 @@
