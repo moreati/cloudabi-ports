@@ -3,6 +3,8 @@
 # This file is distributed under a 2-clause BSD license.
 # See the LICENSE file for details.
 
+import os
+import shutil
 
 def build(ctx):
     srcdir = ctx.extract('Python-%(version)s')
@@ -15,8 +17,15 @@ def build(ctx):
     ])
     with srcdir.diff('/home/edje/python.diff'):
         build.debug_shell()
-    build.make()
-    build.make_install().install()
+    graminits = ['Include/graminit.h', 'Python/graminit.c']
+    for graminit in graminits:
+        src = os.path.join(str(srcdir), graminit)
+        dst = os.path.join(str(build), graminit)
+        os.makedirs(os.path.dirname(dst), exist_ok=True)
+        shutil.copy(src, dst)
+    make_args = ['--assume-old=%s' % graminit for graminit in graminits]
+    build.make(make_args + ['all'])
+    build.make_install(make_args + ['install']).install()
 
 package(
     name='python',
