@@ -51,6 +51,7 @@ distfile(
         'Objects/unicodeobject.c',
         'Parser/parsetok.c',
         'Parser/tokenizer.c',
+        'Python/ast.c',
         'Python/codecs.c',
         'Python/pystrtod.c',
         'Python/traceback.c',
