@@ -19,3 +19,34 @@
  		case "$host_cpu" in
  		arm*)
  			_host_cpu=arm
+@@ -12712,19 +12715,9 @@
+ _ACEOF
+ 
+ 
+-$as_echo "#define HAVE_ST_BLOCKS 1" >>confdefs.h
+-
+-else
+-  case " $LIBOBJS " in
+-  *" fileblocks.$ac_objext "* ) ;;
+-  *) LIBOBJS="$LIBOBJS fileblocks.$ac_objext"
+- ;;
+-esac
+-
+ fi
+ 
+ 
+-
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for time.h that defines altzone" >&5
+ $as_echo_n "checking for time.h that defines altzone... " >&6; }
+ if ${ac_cv_header_time_altzone+:} false; then :
+--- configure.ac
++++ configure.ac
+@@ -3679,7 +3679,7 @@
+ AC_CHECK_MEMBERS([struct stat.st_flags])
+ AC_CHECK_MEMBERS([struct stat.st_gen])
+ AC_CHECK_MEMBERS([struct stat.st_birthtime])
+-AC_STRUCT_ST_BLOCKS
++AC_CHECK_MEMBERS([struct stat.st_blocks])
+ 
+ AC_MSG_CHECKING(for time.h that defines altzone)
+ AC_CACHE_VAL(ac_cv_header_time_altzone,[
