@@ -50,8 +50,6 @@ distfile(
         'Objects/typeobject.c',
         'Objects/unicodeobject.c',
         'Parser/parsetok.c',
-        'Parser/parsetok.c',
-        'Parser/tokenizer.c',
         'Parser/tokenizer.c',
         'Python/codecs.c',
         'Python/pystrtod.c',
