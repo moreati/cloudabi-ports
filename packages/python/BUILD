@@ -17,13 +17,25 @@ def build(ctx):
     ])
     with srcdir.diff('/home/edje/python.diff'):
         build.debug_shell()
-    graminits = ['Include/graminit.h', 'Python/graminit.c']
-    for graminit in graminits:
-        src = os.path.join(str(srcdir), graminit)
-        dst = os.path.join(str(build), graminit)
+
+    # Python's build system is not good for cross compiling. The Makefile
+    # tries to compile mini programs then run them to generate the below.
+    # Except it compiles to the host architecture, which means they segfault
+    # when it tries to run them on the build architecture.
+    # Since the files it's trying to generate already exist in the tarball,
+    # we can just copy them across. Provided we don't modify the templates.
+    pregenerated_files = [
+        'Include/graminit.h',
+        'Python/graminit.c',
+        'Python/importlib_external.h',
+        'Python/importlib.h',
+        ]
+    for fname in pregenerated_files:
+        src = os.path.join(str(srcdir), fname)
+        dst = os.path.join(str(build), fname)
         os.makedirs(os.path.dirname(dst), exist_ok=True)
         shutil.copy(src, dst)
-    make_args = ['--assume-old=%s' % graminit for graminit in graminits]
+    make_args = ['--assume-old=%s' % fname for fname in pregenerated_files]
     build.make(make_args + ['all'])
     build.make_install(make_args + ['install']).install()
 
