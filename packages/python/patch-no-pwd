@@ -1,3 +1,15 @@
+--- Makefile.pre.in
++++ Makefile.pre.in
+@@ -756,7 +756,8 @@
+ 
+ Modules/grpmodule.o: $(srcdir)/Modules/grpmodule.c $(srcdir)/Modules/posixmodule.h
+ 
+-Modules/pwdmodule.o: $(srcdir)/Modules/pwdmodule.c $(srcdir)/Modules/posixmodule.h
++# CloudABI has no support for pwd.h
++#Modules/pwdmodule.o: $(srcdir)/Modules/pwdmodule.c $(srcdir)/Modules/posixmodule.h
+ 
+ Modules/signalmodule.o: $(srcdir)/Modules/signalmodule.c $(srcdir)/Modules/posixmodule.h
+ 
 --- Modules/pwdmodule.c
 +++ Modules/pwdmodule.c
 @@ -4,6 +4,7 @@
@@ -13,3 +25,31 @@
      return m;
  }
 +#endif /* HAVE_PWD */
+--- Modules/Setup.dist
++++ Modules/Setup.dist
+@@ -107,8 +107,11 @@
+ 
+ posix posixmodule.c		# posix (UNIX) system calls
+ errno errnomodule.c		# posix (UNIX) errno values
+-pwd pwdmodule.c			# this is needed to find out the user's home dir
++
++# CloudABI has no support for pwd.h
++#pwd pwdmodule.c			# this is needed to find out the user's home dir
+ 				# if $HOME is not set
++
+ _sre _sre.c			# Fredrik Lundh's new regular expressions
+ _codecs _codecsmodule.c		# access to the builtin codecs and codec registry
+ _weakref _weakref.c		# weak references
+--- setup.py
++++ setup.py
+@@ -640,7 +640,9 @@
+             libs = ['bsd']
+         exts.append( Extension('fcntl', ['fcntlmodule.c'], libraries=libs) )
+         # pwd(3)
+-        exts.append( Extension('pwd', ['pwdmodule.c']) )
++        if config_h_vars.get('HAVE_PWD', False):
++            exts.append( Extension('pwd', ['pwdmodule.c']) )
++
+         # grp(3)
+         exts.append( Extension('grp', ['grpmodule.c']) )
+         # spwd, shadow passwords
