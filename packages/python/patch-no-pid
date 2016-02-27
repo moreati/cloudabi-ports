@@ -17,6 +17,16 @@
  
  #ifdef HAVE_GETGROUPLIST
  
+@@ -12314,7 +12314,9 @@
+     {"getgrouplist",    posix_getgrouplist, METH_VARARGS, posix_getgrouplist__doc__},
+ #endif
+     OS_GETGROUPS_METHODDEF
++#ifdef HAVE_PID
+     OS_GETPID_METHODDEF
++#endif
+     OS_GETPGRP_METHODDEF
+     OS_GETPPID_METHODDEF
+     OS_GETUID_METHODDEF
 --- Modules/signalmodule.c
 +++ Modules/signalmodule.c
 @@ -89,7 +89,9 @@
