@@ -8,38 +8,25 @@ import shutil
 
 def build(ctx):
     srcdir = ctx.extract('Python-%(version)s')
+
+    # First build a native binary, this will be used by the cross-build
+    # to generate some files (see also patch-makefile-regen)
+    hostbuild = srcdir.host().autoconf()
+    hostbuild.make()
+
     build = srcdir.autoconf([
         '--build=x86_64-unknown-freebsd',
         'ac_cv_buggy_getaddrinfo=no',
         'ac_cv_file__dev_ptc=no',
         'ac_cv_file__dev_ptmx=no',
         'ac_cv_have_long_long_format=yes',
-        # TODO Don't hardcode this here
-        'PYTHON_FOR_BUILD=/usr/bin/python3.5',
+        'PYTHON_FOR_BUILD=%s' % os.path.join(hostbuild, 'python'),
     ])
     with srcdir.diff('/home/edje/python.diff'):
         build.debug_shell()
 
-    # Python's build system is not good for cross compiling. The Makefile
-    # tries to compile mini programs then run them to generate the below.
-    # Except it compiles to the host architecture, which means they segfault
-    # when it tries to run them on the build architecture.
-    # Since the files it's trying to generate already exist in the tarball,
-    # we can just copy them across. Provided we don't modify the templates.
-    pregenerated_files = [
-        'Include/graminit.h',
-        'Python/graminit.c',
-        'Python/importlib_external.h',
-        'Python/importlib.h',
-        ]
-    for fname in pregenerated_files:
-        src = os.path.join(str(srcdir), fname)
-        dst = os.path.join(str(build), fname)
-        os.makedirs(os.path.dirname(dst), exist_ok=True)
-        shutil.copy(src, dst)
-    make_args = ['--assume-old=%s' % fname for fname in pregenerated_files]
-    build.make(make_args + ['all'])
-    build.make_install(make_args + ['install']).install()
+    build.make()
+    build.make_install().install()
 
 package(
     name='python',

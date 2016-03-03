@@ -1,0 +1,31 @@
+See https://bugs.python.org/issue22625
+
+diff -r 178d4ffe1249 Makefile.pre.in
+--- a/Makefile.pre.in	Sun Oct 12 16:13:38 2014 +0200
++++ b/Makefile.pre.in	Mon Oct 13 21:17:15 2014 +0200
+@@ -711,11 +711,13 @@ Programs/_freeze_importlib.o: Programs/_freeze_importlib.c Makefile
+ Programs/_freeze_importlib: Programs/_freeze_importlib.o $(LIBRARY_OBJS_OMIT_FROZEN)
+ 	$(LINKCC) $(PY_LDFLAGS) -o $@ Programs/_freeze_importlib.o $(LIBRARY_OBJS_OMIT_FROZEN) $(LIBS) $(MODLIBS) $(SYSLIBS) $(LDLAST)
+ 
+-Python/importlib_external.h: $(srcdir)/Lib/importlib/_bootstrap_external.py Programs/_freeze_importlib
++Python/importlib_external.h: $(srcdir)/Lib/importlib/_bootstrap_external.py
++	$(MAKE) Programs/_freeze_importlib
+ 	./Programs/_freeze_importlib \
+ 		$(srcdir)/Lib/importlib/_bootstrap_external.py Python/importlib_external.h
+ 
+-Python/importlib.h: $(srcdir)/Lib/importlib/_bootstrap.py Programs/_freeze_importlib
++Python/importlib.h: $(srcdir)/Lib/importlib/_bootstrap.py
++	$(MAKE) Programs/_freeze_importlib
+ 	./Programs/_freeze_importlib \
+ 		$(srcdir)/Lib/importlib/_bootstrap.py Python/importlib.h
+ 
+@@ -754,7 +755,8 @@ Python/sysmodule.o: $(srcdir)/Python/sys
+ 
+ $(IO_OBJS): $(IO_H)
+ 
+-$(GRAMMAR_H): $(GRAMMAR_INPUT) $(PGEN)
++$(GRAMMAR_H): $(GRAMMAR_INPUT)
++		$(MAKE) $(PGEN)
+ 		@$(MKDIR_P) Include
+ 		$(PGEN) $(GRAMMAR_INPUT) $(GRAMMAR_H) $(GRAMMAR_C)
+ $(GRAMMAR_C): $(GRAMMAR_H)
