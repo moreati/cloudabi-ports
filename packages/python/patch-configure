@@ -19,6 +19,69 @@
  		case "$host_cpu" in
  		arm*)
  			_host_cpu=arm
+@@ -6441,6 +6441,12 @@
+ 
+ 
+ # Enable PGO flags.
++
++
++
++
++
++
+ # Extract the first word of "llvm-profdata", so it can be a program name with args.
+ set dummy llvm-profdata; ac_word=$2
+ { $as_echo "$as_me:${as_lineno-$LINENO}: checking for $ac_word" >&5
+@@ -7354,7 +7360,7 @@
+ 
+ for ac_header in asm/types.h conio.h direct.h dlfcn.h errno.h \
+ fcntl.h grp.h \
+-ieeefp.h io.h langinfo.h libintl.h process.h pthread.h \
++ieeefp.h io.h langinfo.h libintl.h process.h pthread.h pwd.h \
+ sched.h shadow.h signal.h stdint.h stropts.h termios.h \
+ unistd.h utime.h \
+ poll.h sys/devpoll.h sys/epoll.h sys/poll.h \
+@@ -10943,27 +10949,28 @@
+ fi
+ 
+ # checks for library functions
+-for ac_func in alarm accept4 setitimer getitimer bind_textdomain_codeset chown \
+- clock confstr ctermid dup3 execv faccessat fchmod fchmodat fchown fchownat \
+- fexecve fdopendir fork fpathconf fstatat ftime ftruncate futimesat \
+- futimens futimes gai_strerror getentropy \
++for ac_func in alarm accept4 access setitimer getitimer bindtextdomain bind_textdomain_codeset chdir chmod chown \
++ clock confstr ctermid dcgettext dup3 execv faccessat fchmod fchmodat fchown fchownat \
++ fexecve fdopendir fopen fork fpathconf fstatat ftime ftruncate futimesat \
++ futimens futimes getcwd gai_strerror getentropy \
+  getgrouplist getgroups getlogin getloadavg getpeername getpgid getpid \
+  getpriority getresuid getresgid getpwent getspnam getspent getsid getwd \
+  if_nameindex \
+  initgroups kill killpg lchmod lchown lockf linkat lstat lutimes mmap \
+- memrchr mbrtowc mkdirat mkfifo \
+- mkfifoat mknod mknodat mktime mremap nice openat pathconf pause pipe2 plock poll \
++ memrchr mbrtowc mkdir mkdirat mkfifo \
++ mkfifoat mknod mknodat mktime mremap nice open openat opendir pathconf pause pipe2 plock poll \
+  posix_fallocate posix_fadvise pread \
+- pthread_init pthread_kill putenv pwrite readlink readlinkat readv realpath renameat \
++ pthread_init pthread_kill putenv pwrite readlink readlinkat readv realpath rename renameat \
++ rmdir \
+  select sem_open sem_timedwait sem_getvalue sem_unlink sendfile setegid seteuid \
+  setgid sethostname \
+- setlocale setregid setreuid setresuid setresgid setsid setpgid setpgrp setpriority setuid setvbuf \
++ setlocale setregid setreuid setresuid setresgid setsid setpgid setlocale setpgrp setpriority setuid setvbuf \
+  sched_get_priority_max sched_setaffinity sched_setscheduler sched_setparam \
+  sched_rr_get_interval \
+- sigaction sigaltstack siginterrupt sigpending sigrelse \
+- sigtimedwait sigwait sigwaitinfo snprintf strftime strlcpy symlinkat sync \
+- sysconf tcgetpgrp tcsetpgrp tempnam timegm times tmpfile tmpnam tmpnam_r \
+- truncate uname unlinkat unsetenv utimensat utimes waitid waitpid wait3 wait4 \
++ sigaction sigaltstack siginterrupt signal sigpending sigrelse \
++ sigtimedwait sigwait sigwaitinfo snprintf stat strftime strlcpy symlinkat sync \
++ sysconf tcgetpgrp tcsetpgrp tempnam textdomain timegm times tmpfile tmpnam tmpnam_r \
++ truncate umask uname unlink unlinkat unsetenv utimensat utimes waitid waitpid wait3 wait4 \
+  wcscoll wcsftime wcsxfrm wmemcmp writev _getpty
+ do :
+   as_ac_var=`$as_echo "ac_cv_func_$ac_func" | $as_tr_sh`
 @@ -12712,19 +12715,9 @@
  _ACEOF
  
@@ -60,6 +123,56 @@
  		case "$host_cpu" in
  		arm*)
  			_host_cpu=arm
+@@ -1792,7 +1792,7 @@
+ AC_HEADER_STDC
+ AC_CHECK_HEADERS(asm/types.h conio.h direct.h dlfcn.h errno.h \
+ fcntl.h grp.h \
+-ieeefp.h io.h langinfo.h libintl.h process.h pthread.h \
++ieeefp.h io.h langinfo.h libintl.h process.h pthread.h pwd.h \
+ sched.h shadow.h signal.h stdint.h stropts.h termios.h \
+ unistd.h utime.h \
+ poll.h sys/devpoll.h sys/epoll.h sys/poll.h \
+@@ -3190,27 +3190,28 @@
+ fi
+ 
+ # checks for library functions
+-AC_CHECK_FUNCS(alarm accept4 setitimer getitimer bind_textdomain_codeset chown \
+- clock confstr ctermid dup3 execv faccessat fchmod fchmodat fchown fchownat \
+- fexecve fdopendir fork fpathconf fstatat ftime ftruncate futimesat \
+- futimens futimes gai_strerror getentropy \
++AC_CHECK_FUNCS(alarm accept4 setitimer getitimer bindtextdomain bind_textdomain_codeset chdir chmod chown \
++ clock confstr ctermid dcgettext dup3 execv faccessat fchmod fchmodat fchown fchownat \
++ fexecve fdopendir fopen fork fpathconf fstatat ftime ftruncate futimesat \
++ futimens futimes getcwd gai_strerror getentropy \
+  getgrouplist getgroups getlogin getloadavg getpeername getpgid getpid \
+  getpriority getresuid getresgid getpwent getspnam getspent getsid getwd \
+  if_nameindex \
+  initgroups kill killpg lchmod lchown lockf linkat lstat lutimes mmap \
+- memrchr mbrtowc mkdirat mkfifo \
+- mkfifoat mknod mknodat mktime mremap nice openat pathconf pause pipe2 plock poll \
++ memrchr mbrtowc mkdir mkdirat mkfifo \
++ mkfifoat mknod mknodat mktime mremap nice open openat opendir pathconf pause pipe2 plock poll \
+  posix_fallocate posix_fadvise pread \
+- pthread_init pthread_kill putenv pwrite readlink readlinkat readv realpath renameat \
++ pthread_init pthread_kill putenv pwrite readlink readlinkat readv realpath rename renameat \
++ rmdir \
+  select sem_open sem_timedwait sem_getvalue sem_unlink sendfile setegid seteuid \
+  setgid sethostname \
+- setlocale setregid setreuid setresuid setresgid setsid setpgid setpgrp setpriority setuid setvbuf \
++ setlocale setregid setreuid setresuid setresgid setsid setpgid setlocale setpgrp setpriority setuid setvbuf \
+  sched_get_priority_max sched_setaffinity sched_setscheduler sched_setparam \
+  sched_rr_get_interval \
+- sigaction sigaltstack siginterrupt sigpending sigrelse \
+- sigtimedwait sigwait sigwaitinfo snprintf strftime strlcpy symlinkat sync \
+- sysconf tcgetpgrp tcsetpgrp tempnam timegm times tmpfile tmpnam tmpnam_r \
+- truncate uname unlinkat unsetenv utimensat utimes waitid waitpid wait3 wait4 \
++ sigaction sigaltstack siginterrupt signal sigpending sigrelse \
++ sigtimedwait sigwait sigwaitinfo snprintf stat strftime strlcpy symlinkat sync \
++ sysconf tcgetpgrp tcsetpgrp tempnam textdomain timegm times tmpfile tmpnam tmpnam_r \
++ truncate umask uname unlink unlinkat unsetenv utimensat utimes waitid waitpid wait3 wait4 \
+  wcscoll wcsftime wcsxfrm wmemcmp writev _getpty)
+ 
+ AC_CHECK_DECL(dirfd,
 --- configure.ac
 +++ configure.ac
 @@ -3679,7 +3679,7 @@
@@ -71,3 +184,187 @@
  
  AC_MSG_CHECKING(for time.h that defines altzone)
  AC_CACHE_VAL(ac_cv_header_time_altzone,[
+--- pyconfig.h.in
++++ pyconfig.h.in
+@@ -40,6 +40,9 @@
+ /* Define to 1 if you have the `accept4' function. */
+ #undef HAVE_ACCEPT4
+ 
++/* Define to 1 if you have the `access' function. */
++#undef HAVE_ACCESS
++
+ /* Define to 1 if you have the `acosh' function. */
+ #undef HAVE_ACOSH
+ 
+@@ -67,6 +67,9 @@
+ /* Define to 1 if you have the `atanh' function. */
+ #undef HAVE_ATANH
+ 
++/* Define to 1 if you have the `bindtextdomain' function. */
++#undef HAVE_BINDTEXTDOMAIN
++
+ /* Define to 1 if you have the `bind_textdomain_codeset' function. */
+ #undef HAVE_BIND_TEXTDOMAIN_CODESET
+ 
+@@ -107,9 +110,15 @@
+ /* Define this if you have the type _Bool. */
+ #undef HAVE_C99_BOOL
+ 
++/* Define to 1 if you have the `chdir' function. */
++#undef HAVE_CHDIR
++
+ /* Define to 1 if you have the 'chflags' function. */
+ #undef HAVE_CHFLAGS
+ 
++/* Define to 1 if you have the `chmod' function. */
++#undef HAVE_CHMOD
++
+ /* Define to 1 if you have the `chown' function. */
+ #undef HAVE_CHOWN
+ 
+@@ -155,6 +164,9 @@
+ /* Define if you have the 'resize_term' function. */
+ #undef HAVE_CURSES_RESIZE_TERM
+ 
++/* Define to 1 if you have the `dcgettext' function. */
++#undef HAVE_DCGETTEXT
++
+ /* Define to 1 if you have the declaration of `isfinite', and to 0 if you
+    don't. */
+ #undef HAVE_DECL_ISFINITE
+@@ -268,6 +280,9 @@
+ /* Define to 1 if you have the `flock' function. */
+ #undef HAVE_FLOCK
+ 
++/* Define to 1 if you have the `fopen' function. */
++#undef HAVE_FOPEN
++
+ /* Define to 1 if you have the `fork' function. */
+ #undef HAVE_FORK
+ 
+@@ -335,6 +350,9 @@
+ /* Define if you have the getaddrinfo function. */
+ #undef HAVE_GETADDRINFO
+ 
++/* Define to 1 if you have the `getcwd' function. */
++#undef HAVE_GETCWD
++
+ /* Define this if you have flockfile(), getc_unlocked(), and funlockfile() */
+ #undef HAVE_GETC_UNLOCKED
+ 
+@@ -582,6 +600,9 @@
+ /* Define to 1 if you have the `memrchr' function. */
+ #undef HAVE_MEMRCHR
+ 
++/* Define to 1 if you have the `mkdir' function. */
++#undef HAVE_MKDIR
++
+ /* Define to 1 if you have the `mkdirat' function. */
+ #undef HAVE_MKDIRAT
+ 
+@@ -621,9 +642,15 @@
+ /* Define to 1 if you have the `nice' function. */
+ #undef HAVE_NICE
+ 
++/* Define to 1 if you have the `open' function. */
++#undef HAVE_OPEN
++
+ /* Define to 1 if you have the `openat' function. */
+ #undef HAVE_OPENAT
+ 
++/* Define to 1 if you have the `opendir' function. */
++#undef HAVE_OPENDIR
++
+ /* Define to 1 if you have the `openpty' function. */
+ #undef HAVE_OPENPTY
+ 
+@@ -690,6 +717,9 @@
+ /* Define to 1 if you have the `putenv' function. */
+ #undef HAVE_PUTENV
+ 
++/* Define to 1 if you have the <pwd.h> header file. */
++#undef HAVE_PWD_H
++
+ /* Define to 1 if you have the `pwrite' function. */
+ #undef HAVE_PWRITE
+ 
+@@ -708,6 +738,9 @@
+ /* Define to 1 if you have the `realpath' function. */
+ #undef HAVE_REALPATH
+ 
++/* Define to 1 if you have the `rename' function. */
++#undef HAVE_RENAME
++
+ /* Define to 1 if you have the `renameat' function. */
+ #undef HAVE_RENAMEAT
+ 
+@@ -735,6 +768,9 @@
+ /* Define if you have readline 4.0 */
+ #undef HAVE_RL_PRE_INPUT_HOOK
+ 
++/* Define to 1 if you have the `rmdir' function. */
++#undef HAVE_RMDIR
++
+ /* Define to 1 if you have the `round' function. */
+ #undef HAVE_ROUND
+ 
+@@ -837,6 +873,9 @@
+ /* Define to 1 if you have the `siginterrupt' function. */
+ #undef HAVE_SIGINTERRUPT
+ 
++/* Define to 1 if you have the `signal' function. */
++#undef HAVE_SIGNAL
++
+ /* Define to 1 if you have the <signal.h> header file. */
+ #undef HAVE_SIGNAL_H
+ 
+@@ -873,6 +912,9 @@
+ /* Define if your compiler provides ssize_t */
+ #undef HAVE_SSIZE_T
+ 
++/* Define to 1 if you have the `stat' function. */
++#undef HAVE_STAT
++
+ /* Define to 1 if you have the `statvfs' function. */
+ #undef HAVE_STATVFS
+ 
+@@ -934,10 +976,6 @@
+ /* Define to 1 if `tm_zone' is a member of `struct tm'. */
+ #undef HAVE_STRUCT_TM_TM_ZONE
+ 
+-/* Define to 1 if your `struct stat' has `st_blocks'. Deprecated, use
+-   `HAVE_STRUCT_STAT_ST_BLOCKS' instead. */
+-#undef HAVE_ST_BLOCKS
+-
+ /* Define if you have the 'symlink' function. */
+ #undef HAVE_SYMLINK
+ 
+@@ -1072,6 +1110,9 @@
+ /* Define to 1 if you have the <term.h> header file. */
+ #undef HAVE_TERM_H
+ 
++/* Define to 1 if you have the `textdomain' function. */
++#undef HAVE_TEXTDOMAIN
++
+ /* Define to 1 if you have the `tgamma' function. */
+ #undef HAVE_TGAMMA
+ 
+@@ -1113,12 +1154,18 @@
+ /* Define to 1 if the system has the type `uintptr_t'. */
+ #undef HAVE_UINTPTR_T
+ 
++/* Define to 1 if you have the `umask' function. */
++#undef HAVE_UMASK
++
+ /* Define to 1 if you have the `uname' function. */
+ #undef HAVE_UNAME
+ 
+ /* Define to 1 if you have the <unistd.h> header file. */
+ #undef HAVE_UNISTD_H
+ 
++/* Define to 1 if you have the `unlink' function. */
++#undef HAVE_UNLINK
++
+ /* Define to 1 if you have the `unlinkat' function. */
+ #undef HAVE_UNLINKAT
+ 

@@ -156,6 +156,16 @@
  #endif
 --- Programs/python.c
 +++ Programs/python.c
+@@ -22,7 +22,9 @@
+     /* We need a second copy, as Python might modify the first one. */
+     wchar_t **argv_copy2;
+     int i, res;
++#if defined(setlocale) && defined(LC_ALL)
+     char *oldloc;
++#endif
+ #ifdef __FreeBSD__
+     fp_except_t m;
+ #endif
 @@ -44,6 +44,7 @@
      fpsetmask(m & ~FP_X_OFL);
  #endif
@@ -164,7 +174,7 @@
      oldloc = _PyMem_RawStrdup(setlocale(LC_ALL, NULL));
      if (!oldloc) {
          fprintf(stderr, "out of memory\n");
-@@ -51,6 +52,7 @@
+@@ -51,10 +52,13 @@
      }
  
      setlocale(LC_ALL, "");
@@ -172,6 +182,12 @@
      for (i = 0; i < argc; i++) {
          argv_copy[i] = Py_DecodeLocale(argv[i], NULL);
          if (!argv_copy[i]) {
++#if defined(setlocale) && defined(LC_ALL)
+             PyMem_RawFree(oldloc);
++#endif
+             fprintf(stderr, "Fatal Python error: "
+                             "unable to decode the command line argument #%i\n",
+                             i + 1);
 @@ -64,8 +66,10 @@
      }
      argv_copy2[argc] = argv_copy[argc] = NULL;

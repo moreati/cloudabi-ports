@@ -16,7 +16,7 @@
  #include "Python.h"
  #include "posixmodule.h"
  
-+#ifdef HAVE_PWD
++#ifdef HAVE_PWD_H
  #include <pwd.h>
  
  #include "clinic/pwdmodule.c.h"
@@ -24,7 +24,7 @@
      PyModule_AddObject(m, "struct_passwd", (PyObject *) &StructPwdType);
      return m;
  }
-+#endif /* HAVE_PWD */
++#endif /* HAVE_PWD_H */
 --- Modules/Setup.dist
 +++ Modules/Setup.dist
 @@ -107,8 +107,11 @@
@@ -47,7 +47,7 @@
          exts.append( Extension('fcntl', ['fcntlmodule.c'], libraries=libs) )
          # pwd(3)
 -        exts.append( Extension('pwd', ['pwdmodule.c']) )
-+        if config_h_vars.get('HAVE_PWD', False):
++        if config_h_vars.get('HAVE_PWD_H', False):
 +            exts.append( Extension('pwd', ['pwdmodule.c']) )
 +
          # grp(3)

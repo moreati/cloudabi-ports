@@ -1,10 +1,12 @@
 --- Python/fileutils.c
 +++ Python/fileutils.c
-@@ -101,7 +101,6 @@
+@@ -101,7 +101,9 @@
  static int
  check_force_ascii(void)
  {
--    char *loc;
++#ifdef HAVE_SETLOCALE
+     char *loc;
++#endif /* HAVE_SETLOCALE */
  #if defined(HAVE_LANGINFO_H) && defined(CODESET)
      char *codeset, **alias;
      char encoding[100];
@@ -12,7 +14,7 @@
      };
  #endif
  
-+#if 0
++#if HAVE_SETLOCALE
      loc = setlocale(LC_CTYPE, NULL);
      if (loc == NULL)
          goto error;
@@ -20,18 +22,20 @@
          /* the LC_CTYPE locale is different than C */
          return 0;
      }
-+#endif
++#endif /* HAVE_SETLOCALE */
  
  #if defined(HAVE_LANGINFO_H) && defined(CODESET)
      codeset = nl_langinfo(CODESET);
 --- Python/pylifecycle.c
 +++ Python/pylifecycle.c
-@@ -1139,8 +1139,6 @@
+@@ -1139,8 +1139,10 @@
              /* When the LC_CTYPE locale is the POSIX locale ("C locale"),
                 stdin and stdout use the surrogateescape error handler by
                 default, instead of the strict error handler. */
--            char *loc = setlocale(LC_CTYPE, NULL);
--            if (loc != NULL && strcmp(loc, "C") == 0)
++#ifdef HAVE_SETLOCALE
+             char *loc = setlocale(LC_CTYPE, NULL);
+             if (loc != NULL && strcmp(loc, "C") == 0)
++#endif /* HAVE_SETLOCALE */
                  errors = "surrogateescape";
          }
  

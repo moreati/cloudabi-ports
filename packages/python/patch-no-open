@@ -1,60 +1,69 @@
 --- Include/fileutils.h
 +++ Include/fileutils.h
-@@ -48,11 +48,8 @@
+@@ -48,11 +48,14 @@
      struct _Py_stat_struct *status);
  #endif   /* Py_LIMITED_API */
  
--PyAPI_FUNC(int) _Py_stat(
--    PyObject *path,
--    struct stat *status);
++#ifdef HAVE_STAT
+ PyAPI_FUNC(int) _Py_stat(
+     PyObject *path,
+     struct stat *status);
++#endif /* HAVE_STAT */
  
--#ifndef Py_LIMITED_API
-+#if 0
+ #ifndef Py_LIMITED_API
++#ifdef HAVE_OPEN
  PyAPI_FUNC(int) _Py_open(
      const char *pathname,
      int flags);
-@@ -62,17 +59,8 @@
+@@ -62,17 +59,20 @@
      int flags);
++#endif /* HAVE_OPEN */
  #endif
  
--PyAPI_FUNC(FILE *) _Py_wfopen(
--    const wchar_t *path,
--    const wchar_t *mode);
++#ifdef HAVE_FOPEN
+ PyAPI_FUNC(FILE *) _Py_wfopen(
+     const wchar_t *path,
+     const wchar_t *mode);
  
--PyAPI_FUNC(FILE*) _Py_fopen(
--    const char *pathname,
--    const char *mode);
+ PyAPI_FUNC(FILE*) _Py_fopen(
+     const char *pathname,
+     const char *mode);
  
--PyAPI_FUNC(FILE*) _Py_fopen_obj(
--    PyObject *path,
--    const char *mode);
+ PyAPI_FUNC(FILE*) _Py_fopen_obj(
+     PyObject *path,
+     const char *mode);
++#endif /* HAVE_FOPEN */
  
  PyAPI_FUNC(Py_ssize_t) _Py_read(
      int fd,
-@@ -103,9 +91,6 @@
+@@ -103,9 +91,11 @@
      size_t resolved_path_size);
  #endif
  
--PyAPI_FUNC(wchar_t*) _Py_wgetcwd(
--    wchar_t *buf,
--    size_t size);
++#ifdef HAVE_GETCWD
+ PyAPI_FUNC(wchar_t*) _Py_wgetcwd(
+     wchar_t *buf,
+     size_t size);
++#endif /* HAVE_GETCWD */
  
  #ifndef Py_LIMITED_API
  PyAPI_FUNC(int) _Py_get_inheritable(int fd);
 --- Include/pyerrors.h
 +++ Include/pyerrors.h
-@@ -345,14 +345,6 @@
+@@ -345,14 +345,16 @@
      int lineno,
      int col_offset);
  #endif
--PyAPI_FUNC(PyObject *) PyErr_ProgramText(
--    const char *filename,       /* decoded from the filesystem encoding */
--    int lineno);
--#ifndef Py_LIMITED_API
--PyAPI_FUNC(PyObject *) PyErr_ProgramTextObject(
--    PyObject *filename,
--    int lineno);
--#endif
++#ifdef HAVE_OPEN
+ PyAPI_FUNC(PyObject *) PyErr_ProgramText(
+     const char *filename,       /* decoded from the filesystem encoding */
+     int lineno);
+ #ifndef Py_LIMITED_API
+ PyAPI_FUNC(PyObject *) PyErr_ProgramTextObject(
+     PyObject *filename,
+     int lineno);
+ #endif
++#endif /* HAVE_OPEN */
  
  /* The following functions are used to create and modify unicode
     exceptions from C */
@@ -64,7 +73,7 @@
      return NULL;
  }
  
-+#if 0
++#ifdef HAVE_OPEN
  PyObject *
  PyErr_ProgramText(const char *filename, int lineno)
  {
@@ -72,7 +81,7 @@
      }
      return err_programtext(fp, lineno);
  }
-+#endif
++#endif /* HAVE_OPEN */
  
  #ifdef __cplusplus
  }
@@ -155,7 +164,7 @@
  PyObject *
  _Py_device_encoding(int fd)
  {
-+#if 0
++#ifdef isatty
  #if defined(MS_WINDOWS)
      UINT cp;
  #endif
@@ -163,7 +172,7 @@
              return PyUnicode_FromString(codeset);
      }
  #endif
-+#endif
++#endif /* isatty */
      Py_RETURN_NONE;
  }
  
@@ -171,7 +180,7 @@
     Return 0 on success, -1 on _wstat() / stat() error, -2 if an exception was
     raised. */
  
-+#if 0
++#ifdef HAVE_STAT
  int
  _Py_stat(PyObject *path, struct stat *statbuf)
  {
@@ -179,7 +188,7 @@
      return ret;
  #endif
  }
-+#endif
++#endif /* HAVE_STAT */
  
  
  static int
@@ -187,7 +196,7 @@
      return set_inheritable(fd, inheritable, 1, atomic_flag_works);
  }
  
-+#if 0
++#ifdef HAVE_OPEN
  static int
  _Py_open_impl(const char *pathname, int flags, int gil_held)
  {
@@ -195,7 +204,7 @@
      }
      return f;
  }
-+#endif
++#endif /* HAVE_OPEN */
  
  /* Read count bytes from fd into buf.
  
@@ -203,7 +212,7 @@
     including the null character. Decode the path from the locale encoding.
     Return NULL on error. */
  
-+#if 0
++#ifdef HAVE_GETCWD
  wchar_t*
  _Py_wgetcwd(wchar_t *buf, size_t size)
  {
@@ -211,7 +220,7 @@
      return buf;
  #endif
  }
-+#endif
++#endif /* HAVE_GETCWD */
  
  /* Duplicate a file descriptor. The new file descriptor is created as
     non-inheritable. Return a new file descriptor on success, raise an OSError
