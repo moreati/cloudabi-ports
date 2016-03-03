@@ -99,11 +99,10 @@
  
  #ifdef MS_WINDOWS
  static HANDLE sigint_event = NULL;
-@@ -237,6 +243,8 @@
+@@ -237,6 +243,7 @@
  }
  #endif   /* MS_WINDOWS */
  
-+
 +#ifdef HAVE_SIG_ATOMIC_T
  static void
  trip_signal(int sig_num)
@@ -118,12 +117,12 @@
  static void
  signal_handler(int sig_num)
  {
-@@ -328,7 +338,7 @@
+@@ -328,7 +338,8 @@
          SetEvent(sigint_event);
  #endif
  }
--
 +#endif /* HAVE_SIGNAL */
+ 
  
  #ifdef HAVE_ALARM
  
@@ -135,12 +134,12 @@
  static PyObject *
  signal_signal_impl(PyModuleDef *module, int signalnum, PyObject *handler)
  /*[clinic end generated code: output=622d7d0beebea546 input=deee84af5fa0432c]*/
-@@ -456,7 +467,7 @@
+@@ -456,7 +467,8 @@
      else
          Py_RETURN_NONE;
  }
--
 +#endif /* HAVE_SIGNAL */
+ 
  
  /*[clinic input]
  signal.getsignal
@@ -160,11 +159,11 @@
  
  #ifdef HAVE_SIGINTERRUPT
  
-@@ -526,7 +539,7 @@
+@@ -526,7 +539,8 @@
  
  #endif
  
--
+ 
 +#ifdef HAVE_SIGNAL
  static PyObject*
  signal_set_wakeup_fd(PyObject *self, PyObject *args)

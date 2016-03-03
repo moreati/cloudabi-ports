@@ -34,12 +34,12 @@
  static PyObject *
  posix_getcwd(int use_bytes)
  {
-@@ -3372,7 +3375,7 @@
+@@ -3372,7 +3375,8 @@
  {
      return posix_getcwd(1);
  }
--
 +#endif /* defined(MS_WINDOWS) || defined(HAVE_GETCWD) */
+ 
  
  #if ((!defined(HAVE_LINK)) && defined(MS_WINDOWS))
  #define HAVE_LINK 1
