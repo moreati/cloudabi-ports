@@ -4,7 +4,6 @@
 # See the LICENSE file for details.
 
 import os
-import shutil
 
 def build(ctx):
     srcdir = ctx.extract('Python-%(version)s')
