@@ -1,13 +1,5 @@
 --- Modules/posixmodule.c
 +++ Modules/posixmodule.c
-@@ -161,7 +161,6 @@
- #define HAVE_GETGID     1
- #define HAVE_GETPPID    1
- #define HAVE_GETUID     1
--#define HAVE_OPENDIR    1
- #define HAVE_PIPE       1
- #define HAVE_SYSTEM     1
- #define HAVE_WAIT       1
 @@ -3673,7 +3672,9 @@
          }
  
