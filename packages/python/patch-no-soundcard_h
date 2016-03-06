@@ -1,0 +1,11 @@
+--- setup.py
++++ setup.py
+@@ -1552,7 +1554,7 @@ class PyBuildExt(build_ext):
+         # End multiprocessing
+ 
+         # Platform-specific libraries
+-        if host_platform.startswith(('linux', 'freebsd', 'gnukfreebsd')):
++        if config_h_vars.get('HAVE_SYS_SOUNDCARD_H', False):
+             exts.append( Extension('ossaudiodev', ['ossaudiodev.c']) )
+         else:
+             missing.append('ossaudiodev')
