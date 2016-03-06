@@ -1,0 +1,37 @@
+--- Modules/socketmodule.c
++++ Modules/socketmodule.c
+@@ -1166,8 +1166,12 @@ makesockaddr(SOCKET_T sockfd, struct sockaddr *addr, size_t addrlen, int proto)
+         else
+ #endif /* linux */
+         {
++#ifndef __CloudABI__
+             /* regular NULL-terminated string */
+             return PyUnicode_DecodeFSDefault(a->sun_path);
++#else
++            Py_RETURN_NONE;
++#endif
+         }
+     }
+ #endif /* AF_UNIX */
+@@ -1477,6 +1477,7 @@
+         else
+ #endif /* linux */
+         {
++#ifndef __CloudABI__
+             /* regular NULL-terminated string */
+             if ((size_t)path.len >= sizeof addr->sun_path) {
+                 PyErr_SetString(PyExc_OSError,
+@@ -1486,10 +1486,13 @@
+             }
+             addr->sun_path[path.len] = 0;
++#endif /* __CloudABI__ */
+         }
+         addr->sun_family = s->sock_family;
++#ifndef __CloudABI__
+         memcpy(addr->sun_path, path.buf, path.len);
+         *len_ret = path.len + offsetof(struct sockaddr_un, sun_path);
++#endif /* __CloudABI__ */
+         retval = 1;
+     unix_out:
+         PyBuffer_Release(&path);
+         Py_DECREF(args);
