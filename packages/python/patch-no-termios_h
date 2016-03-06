@@ -1,0 +1,18 @@
+--- Modules/termios.c
++++ Modules/termios.c
+@@ -1,7 +1,9 @@
+ /* termiosmodule.c -- POSIX terminal I/O module implementation.  */
+ 
+ #include "Python.h"
+ 
++#ifdef HAVE_TERMIOS_H
++
+ /* Apparently, on SGI, termios.h won't define CTRL if _XOPEN_SOURCE
+    is defined, so we define it here. */
+ #if defined(__sgi)
+@@ -969,3 +971,5 @@ PyInit_termios(void)
+     }
+     return m;
+ }
++
++#endif /* HAVE_TERMIOS_H */
