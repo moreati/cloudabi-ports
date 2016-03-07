@@ -169,22 +169,6 @@
          loc = Py_None;
 --- Python/fileutils.c
 +++ Python/fileutils.c
-@@ -39,6 +39,7 @@
- PyObject *
- _Py_device_encoding(int fd)
- {
-+#ifdef isatty
- #if defined(MS_WINDOWS)
-     UINT cp;
- #endif
-@@ -67,6 +68,7 @@
-             return PyUnicode_FromString(codeset);
-     }
- #endif
-+#endif /* isatty */
-     Py_RETURN_NONE;
- }
- 
 @@ -704,6 +706,7 @@
     Return 0 on success, -1 on _wstat() / stat() error, -2 if an exception was
     raised. */
