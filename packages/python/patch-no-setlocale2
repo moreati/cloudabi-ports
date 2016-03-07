@@ -136,7 +136,7 @@
              Py_FatalError(
                 "not enough memory to copy PYTHONWARNINGS");
          strcpy(buf, p);
-+#if defined(setlocale) && defined(LC_ALL)
++#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
          oldloc = _PyMem_RawStrdup(setlocale(LC_ALL, NULL));
          setlocale(LC_ALL, "");
 +#endif
@@ -147,7 +147,7 @@
              PySys_AddWarnOptionUnicode(unicode);
              Py_DECREF(unicode);
          }
-+#if defined(setlocale) && defined(LC_ALL)
++#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
          setlocale(LC_ALL, oldloc);
          PyMem_RawFree(oldloc);
 +#endif
@@ -160,7 +160,7 @@
      /* We need a second copy, as Python might modify the first one. */
      wchar_t **argv_copy2;
      int i, res;
-+#if defined(setlocale) && defined(LC_ALL)
++#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
      char *oldloc;
 +#endif
  #ifdef __FreeBSD__
@@ -170,7 +170,7 @@
      fpsetmask(m & ~FP_X_OFL);
  #endif
  
-+#if defined(setlocale) && defined(LC_ALL)
++#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
      oldloc = _PyMem_RawStrdup(setlocale(LC_ALL, NULL));
      if (!oldloc) {
          fprintf(stderr, "out of memory\n");
@@ -182,7 +182,7 @@
      for (i = 0; i < argc; i++) {
          argv_copy[i] = Py_DecodeLocale(argv[i], NULL);
          if (!argv_copy[i]) {
-+#if defined(setlocale) && defined(LC_ALL)
++#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
              PyMem_RawFree(oldloc);
 +#endif
              fprintf(stderr, "Fatal Python error: "
@@ -192,7 +192,7 @@
      }
      argv_copy2[argc] = argv_copy[argc] = NULL;
  
-+#if defined(setlocale) && defined(LC_ALL)
++#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
      setlocale(LC_ALL, oldloc);
      PyMem_RawFree(oldloc);
 +#endif
@@ -205,7 +205,7 @@
          setbuf(stderr, (char *)NULL);
      }
  
-+#if defined(setlocale) && defined(LC_ALL)
++#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
      oldloc = _PyMem_RawStrdup(setlocale(LC_ALL, NULL));
      if (!oldloc) {
          fprintf(stderr, "out of memory\n");
@@ -221,7 +221,7 @@
              goto error;
          }
      }
-+#if defined(setlocale) && defined(LC_ALL)
++#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
      setlocale(LC_ALL, oldloc);
      PyMem_RawFree(oldloc);
      oldloc = NULL;
