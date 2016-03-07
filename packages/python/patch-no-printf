@@ -1,10 +1,48 @@
+--- Doc/includes/run-func.c
++++ Doc/includes/run-func.c
+@@ -39,7 +39,9 @@
+             pValue = PyObject_CallObject(pFunc, pArgs);
+             Py_DECREF(pArgs);
+             if (pValue != NULL) {
++#ifdef HAVE_PRINTF
+                 printf("Result of call: %ld\n", PyLong_AsLong(pValue));
++#endif
+                 Py_DECREF(pValue);
+             }
+             else {
+--- Modules/_decimal/libmpdec/io.c
++++ Modules/_decimal/libmpdec/io.c
+@@ -1567,7 +1567,9 @@ mpd_print(const mpd_t *dec)
+ 
+     decstring = mpd_to_sci(dec, 1);
+     if (decstring != NULL) {
++#ifdef HAVE_PRINTF
+         printf("%s\n", decstring);
++#endif
+         mpd_free(decstring);
+     }
+     else {
+--- Modules/_testcapimodule.c
++++ Modules/_testcapimodule.c
+@@ -2253,7 +2253,11 @@
+         e->tv_sec -=1;
+         e->tv_usec += 1000000;
+     }
++#ifdef HAVE_PRINTF
+     printf("Test %d: %d.%06ds\n", test, (int)e->tv_sec, (int)e->tv_usec);
++#else
++    fprintf(stderr, "Test %d: %d.%06ds\n", test, (int)e->tv_sec, (int)e->tv_usec);
++#endif
+ }
+ 
+ static PyObject *
 --- Modules/main.c
 +++ Modules/main.c
 @@ -503,7 +503,11 @@
          return usage(0, argv[0]);
  
      if (version) {
-+#ifdef printf
++#ifdef HAVE_PRINTF
          printf("Python %s\n", PY_VERSION);
 +#else
 +        fprintf(stderr, "Python %s\n", PY_VERSION);
@@ -14,12 +52,14 @@
  
 --- Parser/acceler.c
 +++ Parser/acceler.c
-@@ -81,20 +81,27 @@
+@@ -81,20 +81,33 @@
          label *l = &g->g_ll.ll_label[lbl];
          int type = l->lb_type;
          if (a->a_arrow >= (1 << 7)) {
-+#ifdef printf
++#ifdef HAVE_PRINTF
              printf("XXX too many states!\n");
++#else
++            fprintf(stderr, "XXX too many states!\n");
 +#endif
              continue;
          }
@@ -27,8 +67,10 @@
              dfa *d1 = PyGrammar_FindDFA(g, type);
              int ibit;
              if (type - NT_OFFSET >= (1 << 7)) {
-+#ifdef printf
++#ifdef HAVE_PRINTF
                  printf("XXX too high nonterminal number!\n");
++#else
++                fprintf(stderr, "XXX too high nonterminal number!\n");
 +#endif
                  continue;
              }
@@ -36,20 +78,304 @@
                  if (testbit(d1->d_first, ibit)) {
 -                    if (accel[ibit] != -1)
 +                    if (accel[ibit] != -1) {
-+#ifdef printf
++#ifdef HAVE_PRINTF
                          printf("XXX ambiguity!\n");
++#else
++                        fprintf(stderr, "XXX ambiguity!\n");
 +#endif
 +                    }
                      accel[ibit] = a->a_arrow | (1 << 7) |
                          ((type - NT_OFFSET) << 8);
                  }
+--- Parser/firstsets.c
++++ Parser/firstsets.c
+@@ -16,8 +16,10 @@
+     int i;
+     dfa *d;
+ 
++#ifdef HAVE_PRINTF
+     if (Py_DebugFlag)
+         printf("Adding FIRST sets ...\n");
++#endif
+     for (i = 0; i < g->g_ndfas; i++) {
+         d = &g->g_dfa[i];
+         if (d->d_first == NULL)
+@@ -40,8 +42,10 @@
+     dfa *d1;
+     label *l0;
+ 
++#ifdef HAVE_PRINTF
+     if (Py_DebugFlag)
+         printf("Calculate FIRST set for '%s'\n", d->d_name);
++#endif
+ 
+     if (dummy == NULL)
+         dummy = newbitset(1);
+@@ -100,6 +104,7 @@
+         }
+     }
+     d->d_first = result;
++#ifdef HAVE_PRINTF
+     if (Py_DebugFlag) {
+         printf("FIRST set for '%s': {", d->d_name);
+         for (i = 0; i < nbits; i++) {
+@@ -108,6 +113,7 @@
+         }
+         printf(" }\n");
+     }
++#endif
+ 
+     PyObject_FREE(sym);
+ }
+--- Parser/grammar.c
++++ Parser/grammar.c
+@@ -102,9 +102,11 @@
+     lb = &ll->ll_label[ll->ll_nlabels++];
+     lb->lb_type = type;
+     lb->lb_str = strdup(str);
++#ifdef HAVE_PRINTF
+     if (Py_DebugFlag)
+         printf("Label @ %8p, %d: %s\n", ll, ll->ll_nlabels,
+                PyGrammar_LabelRepr(lb));
++#endif
+     return Py_SAFE_DOWNCAST(lb - ll->ll_label, Py_intptr_t, int);
+ }
+ 
+@@ -134,8 +136,10 @@
+     int i;
+ 
+ #ifdef Py_DEBUG
++#ifdef HAVE_PRINTF
+     printf("Translating labels ...\n");
+ #endif
++#endif
+     /* Don't translate EMPTY */
+     for (i = EMPTY+1; i < g->g_ll.ll_nlabels; i++)
+         translabel(g, &g->g_ll.ll_label[i]);
+@@ -146,17 +150,21 @@
+ {
+     int i;
+ 
++#ifdef HAVE_PRINTF
+     if (Py_DebugFlag)
+         printf("Translating label %s ...\n", PyGrammar_LabelRepr(lb));
++#endif
+ 
+     if (lb->lb_type == NAME) {
+         for (i = 0; i < g->g_ndfas; i++) {
+             if (strcmp(lb->lb_str, g->g_dfa[i].d_name) == 0) {
++#ifdef HAVE_PRINTF
+                 if (Py_DebugFlag)
+                     printf(
+                         "Label %s is non-terminal %d.\n",
+                         lb->lb_str,
+                         g->g_dfa[i].d_type);
++#endif
+                 lb->lb_type = g->g_dfa[i].d_type;
+                 free(lb->lb_str);
+                 lb->lb_str = NULL;
+@@ -165,16 +173,22 @@
+         }
+         for (i = 0; i < (int)N_TOKENS; i++) {
+             if (strcmp(lb->lb_str, _PyParser_TokenNames[i]) == 0) {
++#ifdef HAVE_PRINTF
+                 if (Py_DebugFlag)
+                     printf("Label %s is terminal %d.\n",
+                         lb->lb_str, i);
++#endif
+                 lb->lb_type = i;
+                 free(lb->lb_str);
+                 lb->lb_str = NULL;
+                 return;
+             }
+         }
++#ifdef HAVE_PRINTF
+         printf("Can't translate NAME label '%s'\n", lb->lb_str);
++#else
++        fprintf(stderr, "Can't translate NAME label '%s'\n", lb->lb_str);
++#endif
+         return;
+     }
+ 
+@@ -185,8 +199,10 @@
+             char *src;
+             char *dest;
+             size_t name_len;
++#ifdef HAVE_PRINTF
+             if (Py_DebugFlag)
+                 printf("Label %s is a keyword\n", lb->lb_str);
++#endif
+             lb->lb_type = NAME;
+             src = lb->lb_str + 1;
+             p = strchr(src, '\'');
+@@ -196,7 +212,11 @@
+                 name_len = strlen(src);
+             dest = (char *)malloc(name_len + 1);
+             if (!dest) {
++#ifdef HAVE_PRINTF
+                 printf("Can't alloc dest '%s'\n", src);
++#else
++                fprintf(stderr, "Can't alloc dest '%s'\n", src);
++#endif
+                 return;
+             }
+             strncpy(dest, src, name_len);
+@@ -212,8 +232,12 @@
+                 lb->lb_str = NULL;
+             }
+             else
++#ifdef HAVE_PRINTF
+                 printf("Unknown OP label %s\n",
+                     lb->lb_str);
++#else
++                fprintf(stderr, "Unknown OP label %s\n", lb->lb_str);
++#endif
+         }
+         else if (lb->lb_str[2] && lb->lb_str[3] == lb->lb_str[0]) {
+             int type = (int) PyToken_TwoChars(lb->lb_str[1],
+@@ -224,8 +248,12 @@
+                 lb->lb_str = NULL;
+             }
+             else
++#ifdef HAVE_PRINTF
+                 printf("Unknown OP label %s\n",
+                     lb->lb_str);
++#else
++                fprintf(stderr, "Unknown OP label %s\n", lb->lb_str);
++#endif
+         }
+         else if (lb->lb_str[2] && lb->lb_str[3] && lb->lb_str[4] == lb->lb_str[0]) {
+             int type = (int) PyToken_ThreeChars(lb->lb_str[1],
+@@ -237,14 +265,27 @@
+                 lb->lb_str = NULL;
+             }
+             else
++#ifdef HAVE_PRINTF
+                 printf("Unknown OP label %s\n",
+                     lb->lb_str);
++#else
++                fprintf(stderr, "Unknown OP label %s\n", lb->lb_str);
++#endif
+         }
+         else
++#ifdef HAVE_PRINTF
+             printf("Can't translate STRING label %s\n",
+                 lb->lb_str);
++#else
++            fprintf(stderr, "Can't translate STRING label %s\n", lb->lb_str);
++#endif
+     }
+     else
++#ifdef HAVE_PRINTF
+         printf("Can't translate label '%s'\n",
+                PyGrammar_LabelRepr(lb));
++#else
++        fprintf(stderr, "Can't translate label '%s'\n",
++                PyGrammar_LabelRepr(lb));
++#endif
+ }
+--- Parser/pgen.c
++++ Parser/pgen.c
+@@ -153,8 +153,10 @@ metacompile(node *n)
+     nfagrammar *gr;
+     int i;
+ 
++#ifdef HAVE_PRINTF
+     if (Py_DebugFlag)
+         printf("Compiling (meta-) parse tree into NFA grammar\n");
++#endif
+     gr = newnfagrammar();
+     REQ(n, MSTART);
+     i = n->n_nchildren - 1; /* Last child is ENDMARKER */
+@@ -311,6 +313,7 @@ dumpstate(labellist *ll, nfa *nf, int istate)
+     int i;
+     nfaarc *ar;
+ 
++#ifdef HAVE_PRINTF
+     printf("%c%2d%c",
+         istate == nf->nf_start ? '*' : ' ',
+         istate,
+@@ -325,6 +328,7 @@ dumpstate(labellist *ll, nfa *nf, int istate)
+         ar++;
+     }
+     printf("\n");
++#endif
+ }
+ 
+ static void
+@@ -332,8 +336,10 @@ dumpnfa(labellist *ll, nfa *nf)
+ {
+     int i;
+ 
++#ifdef HAVE_PRINTF
+     printf("NFA '%s' has %d states; start %d, finish %d\n",
+         nf->nf_name, nf->nf_nstates, nf->nf_start, nf->nf_finish);
++#endif
+     for (i = 0; i < nf->nf_nstates; i++)
+         dumpstate(ll, nf, i);
+ }
+@@ -408,8 +414,13 @@ makedfa(nfagrammar *gr, nfa *nf, dfa *d)
+     yy->ss_deleted = 0;
+     yy->ss_finish = testbit(ss, nf->nf_finish);
+     if (yy->ss_finish)
++#ifdef HAVE_PRINTF
+         printf("Error: nonterminal '%s' may produce empty.\n",
+             nf->nf_name);
++#else
++        fprintf(stderr, "Error: nonterminal '%s' may produce empty.\n",
++            nf->nf_name);
++#endif
+ 
+     /* This algorithm is from a book written before
+        the invention of structured programming... */
+@@ -500,6 +511,7 @@ printssdfa(int xx_nstates, ss_state *xx_state, int nbits,
+     ss_state *yy;
+     ss_arc *zz;
+ 
++#ifdef HAVE_PRINTF
+     printf("Subset DFA %s\n", msg);
+     for (i = 0; i < xx_nstates; i++) {
+         yy = &xx_state[i];
+@@ -522,6 +534,7 @@ printssdfa(int xx_nstates, ss_state *xx_state, int nbits,
+                     &ll->ll_label[zz->sa_label]));
+         }
+     }
++#endif /* HAVE_PRINTF */
+ }
+ 
+ 
+@@ -554,8 +567,10 @@ renamestates(int xx_nstates, ss_state *xx_state, int from, int to)
+ {
+     int i, j;
+ 
++#ifdef HAVE_PRINTF
+     if (Py_DebugFlag)
+         printf("Rename state %d to %d.\n", from, to);
++#endif
+     for (i = 0; i < xx_nstates; i++) {
+         if (xx_state[i].ss_deleted)
+             continue;
+@@ -648,9 +663,13 @@ maketables(nfagrammar *gr)
+     for (i = 0; i < gr->gr_nnfas; i++) {
+         nf = gr->gr_nfa[i];
+         if (Py_DebugFlag) {
++#ifdef HAVE_PRINTF
+             printf("Dump of NFA for '%s' ...\n", nf->nf_name);
++#endif
+             dumpnfa(&gr->gr_ll, nf);
++#ifdef HAVE_PRINTF
+             printf("Making DFA for '%s' ...\n", nf->nf_name);
++#endif
+         }
+         d = adddfa(g, nf->nf_type, nf->nf_name);
+         makedfa(gr, gr->gr_nfa[i], d);
 --- Parser/pgenmain.c
 +++ Parser/pgenmain.c
 @@ -58,8 +58,10 @@
          perror(graminit_c);
          Py_Exit(1);
      }
-+#ifdef printf
++#ifdef HAVE_PRINTF
      if (Py_DebugFlag)
          printf("Writing %s ...\n", graminit_c);
 +#endif
@@ -60,7 +386,7 @@
          perror(graminit_h);
          Py_Exit(1);
      }
-+#ifdef printf
++#ifdef HAVE_PRINTF
      if (Py_DebugFlag)
          printf("Writing %s ...\n", graminit_h);
 +#endif
@@ -71,7 +397,7 @@
      g = pgen(n);
      PyNode_Free(n);
      if (g == NULL) {
-+#ifdef printf
++#ifdef HAVE_PRINTF
          printf("Bad grammar.\n");
 +#endif
          Py_Exit(1);
