@@ -1,5 +1,14 @@
 --- Include/fileutils.h
 +++ Include/fileutils.h
+@@ -5,6 +5,8 @@
+ extern "C" {
+ #endif
+ 
++#include "pyconfig.h"
++
+ PyAPI_FUNC(PyObject *) _Py_device_encoding(int);
+ 
+ PyAPI_FUNC(wchar_t *) Py_DecodeLocale(
 @@ -48,11 +48,14 @@
      struct _Py_stat_struct *status);
  #endif   /* Py_LIMITED_API */
