@@ -1,3 +1,21 @@
+--- Modules/clinic/posixmodule.c.h
++++ Modules/clinic/posixmodule.c.h
+@@ -757,6 +761,7 @@
+ 
+ #endif /* defined(HAVE_LCHOWN) */
+ 
++#ifdef HAVE_GETCWD
+ PyDoc_STRVAR(os_getcwd__doc__,
+ "getcwd($module, /)\n"
+ "--\n"
+@@ -792,6 +797,7 @@
+ {
+     return os_getcwdb_impl(module);
+ }
++#endif /* HAVE_GETCWD */
+ 
+ #if defined(HAVE_LINK)
+ 
 --- Modules/getpath.c
 +++ Modules/getpath.c
 @@ -254,11 +254,13 @@
