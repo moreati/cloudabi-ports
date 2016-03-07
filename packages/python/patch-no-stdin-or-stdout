@@ -118,6 +118,16 @@
      if (command) {
          sts = run_command(command, &cf);
          PyMem_RawFree(command);
+@@ -826,7 +826,9 @@ Py_Main(int argc, wchar_t **argv)
+         Py_InspectFlag = 0;
+         RunInteractiveHook();
+         /* XXX */
++#ifdef stdin
+         sts = PyRun_AnyFileFlags(stdin, "<stdin>", &cf) != 0;
++#endif
+     }
+ 
+     Py_Finalize();
 --- Modules/_sqlite/cache.c
 +++ Modules/_sqlite/cache.c
 @@ -238,7 +238,9 @@
