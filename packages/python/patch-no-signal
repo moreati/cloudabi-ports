@@ -1,3 +1,46 @@
+--- Modules/clinic/signalmodule.c.h
++++ Modules/clinic/signalmodule.c.h
+@@ -58,6 +58,7 @@
+ 
+ #endif /* defined(HAVE_PAUSE) */
+ 
++#ifdef HAVE_SIGNAL
+ PyDoc_STRVAR(signal_signal__doc__,
+ "signal($module, signalnum, handler, /)\n"
+ "--\n"
+@@ -92,7 +93,9 @@
+ exit:
+     return return_value;
+ }
++#endif /* HAVE_SIGNAL */
+ 
++#ifdef HAVE_SIGNAL
+ PyDoc_STRVAR(signal_getsignal__doc__,
+ "getsignal($module, signalnum, /)\n"
+ "--\n"
+@@ -124,6 +127,7 @@
+ exit:
+     return return_value;
+ }
++#endif /* HAVE_SIGNAL */
+ 
+ #if defined(HAVE_SIGINTERRUPT)
+ 
+@@ -394,6 +398,14 @@
+     #define SIGNAL_PAUSE_METHODDEF
+ #endif /* !defined(SIGNAL_PAUSE_METHODDEF) */
+ 
++#ifndef SIGNAL_SIGNAL_METHODDEF
++    #define SIGNAL_SIGNAL_METHODDEF
++#endif /* !defined(SIGNAL_SIGNAL_METHODDEF) */
++
++#ifndef SIGNAL_GETSIGNAL_METHODDEF
++    #define SIGNAL_GETSIGNAL_METHODDEF
++#endif /* !defined(SIGNAL_GETSIGNAL_METHODDEF) */
++
+ #ifndef SIGNAL_SIGINTERRUPT_METHODDEF
+     #define SIGNAL_SIGINTERRUPT_METHODDEF
+ #endif /* !defined(SIGNAL_SIGINTERRUPT_METHODDEF) */
 --- Modules/faulthandler.c
 +++ Modules/faulthandler.c
 @@ -326,7 +326,7 @@
