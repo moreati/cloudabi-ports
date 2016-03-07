@@ -1,0 +1,20 @@
+--- Modules/_posixsubprocess.c
++++ Modules/_posixsubprocess.c
+@@ -491,9 +497,17 @@ child_exec(char *const exec_array[],
+     for (i = 0; exec_array[i] != NULL; ++i) {
+         const char *executable = exec_array[i];
+         if (envp) {
++#ifdef HAVE_EXECVE
+             execve(executable, argv, envp);
++#else
++            errno = ENAMETOOLONG;
++#endif
+         } else {
++#ifdef HAVE_EXECV
+             execv(executable, argv);
++#else
++            errno = EPROTONOSUPPORT;
++#endif
+         }
+         if (errno != ENOENT && errno != ENOTDIR && saved_errno == 0) {
+             saved_errno = errno;
