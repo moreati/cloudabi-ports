@@ -6,7 +6,7 @@
  extern int link(const char *, const char *);
 +#ifdef HAVE_RENAME
  extern int rename(const char *, const char *);
-+#endif /*HAVE_RENAME */
++#endif /* HAVE_RENAME */
  extern int stat(const char *, struct stat *);
  extern int unlink(const char *);
  #ifdef HAVE_SYMLINK
