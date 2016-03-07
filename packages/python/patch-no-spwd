@@ -1,0 +1,33 @@
+--- Modules/spwdmodule.c
++++ Modules/spwdmodule.c
+@@ -17,6 +17,8 @@ module spwd
+ [clinic start generated code]*/
+ /*[clinic end generated code: output=da39a3ee5e6b4b0d input=c0b841b90a6a07ce]*/
+ 
++#if defined(HAVE_GETSPNAM) || defined(HAVE_GETSPENT)
++
+ PyDoc_STRVAR(spwd__doc__,
+ "This module provides access to the Unix shadow password database.\n\
+ It is available on various Unix versions.\n\
+@@ -29,8 +31,6 @@ An exception is raised if the entry asked for cannot be found.\n\
+ You have to be root to be able to use this module.");
+ 
+ 
+-#if defined(HAVE_GETSPNAM) || defined(HAVE_GETSPENT)
+-
+ static PyStructSequence_Field struct_spwd_type_fields[] = {
+     {"sp_namp", "login name"},
+     {"sp_pwdp", "encrypted password"},
+@@ -183,6 +183,7 @@ spwd_getspall_impl(PyModuleDef *module)
+ 
+ #endif /* HAVE_GETSPENT */
+ 
++#if defined(HAVE_GETSPNAM) || defined(HAVE_GETSPENT)
+ static PyMethodDef spwd_methods[] = {
+ #ifdef HAVE_GETSPNAM
+     SPWD_GETSPNAM_METHODDEF
+@@ -224,3 +225,4 @@ PyInit_spwd(void)
+     initialized = 1;
+     return m;
+ }
++#endif /* defined(HAVE_GETSPNAM) || defined(HAVE_GETSPENT) */
