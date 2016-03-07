@@ -1,3 +1,21 @@
+--- Modules/clinic/posixmodule.c.h
++++ Modules/clinic/posixmodule.c.h
+@@ -2268,6 +2270,7 @@
+ 
+ #endif /* defined(HAVE_GETGID) */
+ 
++#ifdef HAVE_GETPID
+ PyDoc_STRVAR(os_getpid__doc__,
+ "getpid($module, /)\n"
+ "--\n"
+@@ -2285,6 +2288,7 @@
+ {
+     return os_getpid_impl(module);
+ }
++#endif /* HAVE_GETPID */
+ 
+ #if defined(HAVE_GETGROUPS)
+ 
 --- Modules/posixmodule.c
 +++ Modules/posixmodule.c
 @@ -6036,7 +6036,8 @@
