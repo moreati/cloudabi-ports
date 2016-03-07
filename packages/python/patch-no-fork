@@ -1,0 +1,15 @@
+--- Modules/_posixsubprocess.c
++++ Modules/_posixsubprocess.c
+@@ -662,7 +676,12 @@ subprocess_fork_exec(PyObject* self, PyObject *args)
+         cwd_obj2 = NULL;
+     }
+ 
++#ifdef HAVE_FORK
+     pid = fork();
++#else
++    pid = -1;
++    errno = ENOTSUP;
++#endif
+     if (pid == 0) {
+         /* Child process */
+         /*
