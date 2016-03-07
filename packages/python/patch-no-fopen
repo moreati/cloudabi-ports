@@ -139,3 +139,77 @@
              fprintf(stderr, "python: Can't reopen .pyc file\n");
              goto done;
          }
+--- Modules/_testcapimodule.c
++++ Modules/_testcapimodule.c
+@@ -3247,7 +3247,11 @@ pymarshal_write_long_to_file(PyObject* self, PyObject *args)
+                           &value, &filename, &version))
+         return NULL;
+ 
++#ifdef HAVE_FOPEN
+     fp = fopen(filename, "wb");
++#else
++    fp = NULL;
++#endif
+     if (fp == NULL) {
+         PyErr_SetFromErrno(PyExc_OSError);
+         return NULL;
+@@ -3273,7 +3277,11 @@ pymarshal_write_object_to_file(PyObject* self, PyObject *args)
+                           &obj, &filename, &version))
+         return NULL;
+ 
++#ifdef HAVE_FOPEN
+     fp = fopen(filename, "wb");
++#else
++    fp = NULL;
++#endif
+     if (fp == NULL) {
+         PyErr_SetFromErrno(PyExc_OSError);
+         return NULL;
+@@ -3298,7 +3306,11 @@ pymarshal_read_short_from_file(PyObject* self, PyObject *args)
+     if (!PyArg_ParseTuple(args, "s:pymarshal_read_short_from_file", &filename))
+         return NULL;
+ 
++#ifdef HAVE_FOPEN
+     fp = fopen(filename, "rb");
++#else
++    fp = NULL;
++#endif
+     if (fp == NULL) {
+         PyErr_SetFromErrno(PyExc_OSError);
+         return NULL;
+@@ -3323,7 +3335,11 @@ pymarshal_read_long_from_file(PyObject* self, PyObject *args)
+     if (!PyArg_ParseTuple(args, "s:pymarshal_read_long_from_file", &filename))
+         return NULL;
+ 
++#ifdef HAVE_FOPEN
+     fp = fopen(filename, "rb");
++#else
++    fp = NULL;
++#endif
+     if (fp == NULL) {
+         PyErr_SetFromErrno(PyExc_OSError);
+         return NULL;
+@@ -3349,7 +3365,11 @@ pymarshal_read_last_object_from_file(PyObject* self, PyObject *args)
+     if (!PyArg_ParseTuple(args, "s:pymarshal_read_last_object_from_file", &filename))
+         return NULL;
+ 
++#ifdef HAVE_FOPEN
+     fp = fopen(filename, "rb");
++#else
++    fp = NULL;
++#endif
+     if (fp == NULL) {
+         PyErr_SetFromErrno(PyExc_OSError);
+         return NULL;
+@@ -3373,7 +3393,11 @@ pymarshal_read_object_from_file(PyObject* self, PyObject *args)
+     if (!PyArg_ParseTuple(args, "s:pymarshal_read_object_from_file", &filename))
+         return NULL;
+ 
++#ifdef HAVE_FOPEN
+     fp = fopen(filename, "rb");
++#else
++    fp = NULL;
++#endif
+     if (fp == NULL) {
+         PyErr_SetFromErrno(PyExc_OSError);
+         return NULL;
