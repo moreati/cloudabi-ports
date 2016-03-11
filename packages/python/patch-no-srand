@@ -1,0 +1,23 @@
+--- Modules/expat/xmlparse.c
++++ Modules/expat/xmlparse.c
+@@ -20,7 +20,9 @@
+ #include <string.h>                     /* memset(), memcpy() */
+ #include <assert.h>
+ #include <limits.h>                     /* UINT_MAX */
++#if !defined(__CloudABI__)
+ #include <time.h>                       /* time() */
++#endif
+ 
+ #include "ascii.h"
+ #include "expat.h"
+@@ -693,8 +695,10 @@ static const XML_Char implicitContext[] = {
+ static unsigned long
+ generate_hash_secret_salt(void)
+ {
++#if !defined(__CloudABI__)
+   unsigned int seed = time(NULL) % UINT_MAX;
+   srand(seed);
++#endif
+   return rand();
+ }
+ 
