@@ -15,11 +15,14 @@ def build(ctx):
 
     build = srcdir.autoconf([
         '--build=x86_64-unknown-freebsd',
+        '--disable-shared',
         'ac_cv_buggy_getaddrinfo=no',
         'ac_cv_file__dev_ptc=no',
         'ac_cv_file__dev_ptmx=no',
         'ac_cv_have_long_long_format=yes',
         'ac_cv_posix_semaphores_enabled=no',
+        'CPPFLAGS=-static',
+        'LDFLAGS=-static -static-libgcc',
         'PYTHON_FOR_BUILD=_PYTHON_PROJECT_BASE=$(abs_builddir) '
                          '_PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) '
                          'PYTHONPATH=$(shell test -f pybuilddir.txt '
