@@ -19,7 +19,13 @@ def build(ctx):
         'ac_cv_file__dev_ptc=no',
         'ac_cv_file__dev_ptmx=no',
         'ac_cv_have_long_long_format=yes',
-        'PYTHON_FOR_BUILD=%s' % os.path.join(str(hostbuild), 'python'),
+        'PYTHON_FOR_BUILD=_PYTHON_PROJECT_BASE=$(abs_builddir) '
+                         '_PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) '
+                         'PYTHONPATH=$(shell test -f pybuilddir.txt '
+                                            '&& echo $(abs_builddir)/`cat pybuilddir.txt`:)'
+                                    '$(srcdir)/Lib:'
+                                    '$(srcdir)/Lib/$(PLATDIR) '
+                         '%s' % os.path.join(str(hostbuild), 'python'),
     ])
     with srcdir.diff('/home/edje/python.diff'):
         build.debug_shell()
