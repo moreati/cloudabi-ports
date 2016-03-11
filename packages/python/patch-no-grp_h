@@ -8,12 +8,10 @@
  #include <grp.h>
  
  #include "clinic/grpmodule.c.h"
-@@ -242,3 +243,6 @@ PyInit_grp(void)
+@@ -242,3 +243,4 @@ PyInit_grp(void)
      initialized = 1;
      return m;
  }
-+#else
-+#error "No grp? No way!"
 +#endif /* HAVE_GRP_H */
 --- setup.py
 +++ setup.py
