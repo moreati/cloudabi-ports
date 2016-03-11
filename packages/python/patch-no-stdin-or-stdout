@@ -184,10 +184,12 @@
                  char *translated = translate_newlines(newtok, 0, tok);
 --- Programs/_testembed.c
 +++ Programs/_testembed.c
-@@ -27,11 +27,15 @@
+@@ -27,11 +27,17 @@
      /* Just output some debug stuff */
      PyThreadState *ts = PyThreadState_Get();
++#if defined(HAVE_PRINTF)
      printf("interp %p, thread state %p: ", ts->interp, ts);
++#endif
 +#ifdef stdout
      fflush(stdout);
 +#endif
@@ -200,10 +202,29 @@
      );
  }
  
-@@ -91,7 +89,9 @@
+@@ -46,7 +48,9 @@ static void test_repeated_init_and_subinterpreters(void)
+     int i, j;
+ 
+     for (i=0; i<3; i++) {
++#if defined(HAVE_PRINTF)
+         printf("--- Pass %d ---\n", i);
++#endif
+         _testembed_Py_Initialize();
+         mainstate = PyThreadState_Get();
+ 
+@@ -83,6 +87,7 @@ static void test_repeated_init_and_subinterpreters(void)
+ static void check_stdio_details(const char *encoding, const char * errors)
+ {
+     /* Output info for the test case to check */
++#if defined(HAVE_PRINTF)
+     if (encoding) {
+         printf("Expected encoding: %s\n", encoding);
+     } else {
+@@ -91,7 +89,10 @@
      } else {
          printf("Expected errors: default\n");
      }
++#endif /* defined(HAVE_PRINTF) */
 +#ifdef stdout
      fflush(stdout);
 +#endif
@@ -218,6 +239,30 @@
          "sys.stdout.flush()"
 +#endif
      );
+     Py_Finalize();
+ }
+@@ -114,6 +120,7 @@ static void check_stdio_details(const char *encoding, const char * errors)
+ static void test_forced_io_encoding(void)
+ {
+     /* Check various combinations */
++#if defined(HAVE_PRINTF)
+     printf("--- Use defaults ---\n");
+     check_stdio_details(NULL, NULL);
+     printf("--- Set errors only ---\n");
+@@ -122,12 +129,15 @@ static void test_forced_io_encoding(void)
+     check_stdio_details("latin-1", NULL);
+     printf("--- Set encoding and errors ---\n");
+     check_stdio_details("latin-1", "replace");
++#endif /* defined(HAVE_PRINTF) */
+ 
+     /* Check calling after initialization fails */
+     Py_Initialize();
+ 
+     if (Py_SetStandardStreamEncoding(NULL, NULL) == 0) {
++#if defined(HAVE_PRINTF)
+         printf("Unexpected success calling Py_SetStandardStreamEncoding");
++#endif /* defined(HAVE_PRINTF) */
+     }
      Py_Finalize();
  }
 --- Python/bltinmodule.c

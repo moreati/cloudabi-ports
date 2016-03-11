@@ -10,6 +10,54 @@
                  Py_DECREF(pValue);
              }
              else {
+--- Modules/_ctypes/_ctypes_test.c
++++ Modules/_ctypes/_ctypes_test.c
+@@ -11,6 +11,10 @@
+ #define EXPORT(x) x
+ #endif
+ 
++#if defined(__CloudABI__)
++#define printf(...) fprintf(stderr, __VA_ARGS__)
++#endif
++
+ /* some functions handy for testing */
+ 
+ EXPORT(int)
+@@ -64,14 +68,26 @@ EXPORT(int)myprintf(char *fmt, ...)
+     int result;
+     va_list argptr;
+     va_start(argptr, fmt);
++#if !defined(__CloudABI__)
+     result = vprintf(fmt, argptr);
++#else
++    result = vfprintf(stderr, fmt, argptr);
++#endif
+     va_end(argptr);
+     return result;
+ }
+ 
++#if defined(__CloudABI__)
++char *__my_strtok_saveptr;
++#endif
++
+ EXPORT(char *)my_strtok(char *token, const char *delim)
+ {
++#if !defined(__CloudABI__)
+     return strtok(token, delim);
++#else
++    return strtok_r(token, delim, &__my_strtok_saveptr);
++#endif
+ }
+ 
+ EXPORT(char *)my_strchr(const char *s, int c)
+@@ -658,3 +674,7 @@ PyInit__ctypes_test(void)
+ {
+     return PyModule_Create(&_ctypes_testmodule);
+ }
++
++#if defined(__CloudABI__)
++#undef printf
++#endif
 --- Modules/_decimal/libmpdec/io.c
 +++ Modules/_decimal/libmpdec/io.c
 @@ -1567,7 +1567,9 @@ mpd_print(const mpd_t *dec)
