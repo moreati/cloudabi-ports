@@ -6,7 +6,7 @@
 import os
 
 def build(ctx):
-    srcdir = ctx.extract('Python-%(version)s')
+    srcdir = ctx.extract('cpython-d1f2fdde1a305911a04bbdc0558cddfadb3ffb39')
 
     # First build a native binary, this will be used by the cross-build
     # to generate some files (see also patch-makefile-regen)
@@ -35,12 +35,16 @@ def build(ctx):
     with srcdir.diff('/home/edje/python.diff'):
         build.debug_shell()
 
-    build.make()
-    build.make_install().install()
+    build.make([
+        '--assume-new=Parser/pgen',
+        '--assume-new=Programs/_freeze_importlib',
+    ])
+    install = build.make_install()
+    install.install()
 
 package(
     name='python',
-    version='3.5.1',
+    version='3.6.0',
     homepage='https://www.python.org/',
     maintainer='info@nuxi.nl',
     lib_depends={'c-runtime'},
@@ -48,9 +52,9 @@ package(
 )
 
 distfile(
-    name='Python-3.5.1.tar.xz',
-    checksum='c6d57c0c366d9060ab6c0cdf889ebf3d92711d466cc0119c441dbf2746f725c9',
-    master_sites={'https://www.python.org/ftp/python/3.5.1/'},
+    name='cpython-d1f2fdde1a305911a04bbdc0558cddfadb3ffb39.zip',
+    checksum='2e333d169defd4612bc69525fbd1292e72c675cc08f3d896e91f31d988084ab0',
+    master_sites={'https://github.com/python/cpython/archive/'},
     unsafe_string_sources={
         'Modules/_ctypes/_ctypes_test.c',
         'Modules/_datetimemodule.c',
