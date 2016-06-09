@@ -56,6 +56,7 @@ distfile(
     checksum='2e333d169defd4612bc69525fbd1292e72c675cc08f3d896e91f31d988084ab0',
     master_sites={'https://github.com/python/cpython/archive/'},
     unsafe_string_sources={
+        'Modules/_ctypes/_ctypes.c',
         'Modules/_ctypes/_ctypes_test.c',
         'Modules/_datetimemodule.c',
         'Modules/_decimal/_decimal.c',
