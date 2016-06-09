@@ -56,7 +56,7 @@
          julyname[9] = '\0';
 --- Modules/_datetimemodule.c
 +++ Modules/_datetimemodule.c
-@@ -2458,17 +2458,17 @@ date_new(PyTypeObject *type, PyObject *args, PyObject *kw)
+@@ -2456,17 +2456,17 @@
      return self;
  }
  
@@ -77,7 +77,7 @@
      if (tm == NULL) {
          /* unconvertible time */
  #ifdef EINVAL
-@@ -4042,20 +4042,20 @@ datetime_new(PyTypeObject *type, PyObject *args, PyObject *kw)
+@@ -4077,20 +4077,20 @@
      return self;
  }
  
@@ -103,7 +103,7 @@
      if (tm == NULL) {
  #ifdef EINVAL
          if (errno == 0)
-@@ -4064,7 +4064,7 @@ datetime_from_timet_and_us(PyObject *cls, TM_FUNC f, time_t timet, int us,
+@@ -4099,7 +4099,7 @@
          return PyErr_SetFromErrno(PyExc_OSError);
      }
  
@@ -112,7 +112,7 @@
       * indicated by tm->tm_sec > 59.  We don't care about them,
       * except to the extent that passing them on to the datetime
       * constructor would raise ValueError for a reason that
-@@ -4122,7 +4122,7 @@ _PyTime_RoundHalfEven(double x)
+@@ -4119,7 +4119,7 @@
  }
  
  /* Internal helper.
@@ -121,7 +121,7 @@
   * to control the interpretation of the timestamp.  Since a double doesn't
   * have enough bits to cover a datetime's full range of precision, it's
   * better to call datetime_from_timet_and_us provided you have a way
-@@ -4158,8 +4158,8 @@ datetime_from_timestamp(PyObject *cls, TM_FUNC f, double timestamp,
+@@ -4140,8 +4140,8 @@
  }
  
  /* Internal helper.
@@ -132,7 +132,7 @@
   */
  static PyObject *
  datetime_best_possible(PyObject *cls, TM_FUNC f, PyObject *tzinfo)
-@@ -4201,7 +4201,7 @@ datetime_datetime_now_impl(PyTypeObject *type, PyObject *tz)
+@@ -4183,7 +4183,7 @@
          return NULL;
  
      self = datetime_best_possible((PyObject *)type,
@@ -141,7 +141,7 @@
                                    tz);
      if (self != NULL && tz != Py_None) {
          /* Convert UTC to tzinfo's zone. */
-@@ -4219,7 +4219,7 @@ datetime_datetime_now_impl(PyTypeObject *type, PyObject *tz)
+@@ -4198,7 +4198,7 @@
  static PyObject *
  datetime_utcnow(PyObject *cls, PyObject *dummy)
  {
@@ -150,7 +150,7 @@
  }
  
  /* Return new local datetime from timestamp (Python timestamp -- a double). */
-@@ -4238,7 +4238,7 @@ datetime_fromtimestamp(PyObject *cls, PyObject *args, PyObject *kw)
+@@ -4217,7 +4217,7 @@
          return NULL;
  
      self = datetime_from_timestamp(cls,
@@ -159,16 +159,16 @@
                                     timestamp,
                                     tzinfo);
      if (self != NULL && tzinfo != Py_None) {
-@@ -4259,7 +4259,7 @@ datetime_utcfromtimestamp(PyObject *cls, PyObject *args)
+@@ -4235,7 +4235,7 @@
      PyObject *result = NULL;
  
-     if (PyArg_ParseTuple(args, "d:utcfromtimestamp", &timestamp))
+     if (PyArg_ParseTuple(args, "O:utcfromtimestamp", &timestamp))
 -        result = datetime_from_timestamp(cls, gmtime, timestamp,
 +        result = datetime_from_timestamp(cls, gmtime_r, timestamp,
                                           Py_None);
      return result;
  }
-@@ -4741,7 +4741,7 @@ static PyObject *
+@@ -4745,7 +4745,7 @@
  local_timezone(PyDateTime_DateTime *utc_time)
  {
      PyObject *result = NULL;
@@ -177,7 +177,7 @@
      time_t timestamp;
      PyObject *delta;
      PyObject *one_second;
-@@ -4765,7 +4765,7 @@ local_timezone(PyDateTime_DateTime *utc_time)
+@@ -4774,7 +4774,7 @@
      Py_DECREF(seconds);
      if (timestamp == -1 && PyErr_Occurred())
          return NULL;

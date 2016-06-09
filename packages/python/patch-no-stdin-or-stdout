@@ -387,8 +387,8 @@
  _Py_IDENTIFIER(stderr);
  
  #ifdef __cplusplus
-@@ -480,10 +484,13 @@
- static void
+@@ -482,11 +486,14 @@
+ static int
  flush_std_files(void)
  {
 +#ifdef stdout
@@ -396,12 +396,13 @@
 +#endif
      PyObject *ferr = _PySys_GetObjectId(&PyId_stderr);
      PyObject *tmp;
+     int status = 0;
  
 +#ifdef stdout
      if (fout != NULL && fout != Py_None && !file_is_closed(fout)) {
          tmp = _PyObject_CallMethodId(fout, &PyId_flush, "");
-         if (tmp == NULL)
-@@ -491,6 +498,7 @@
+         if (tmp == NULL) {
+@@ -496,6 +503,7 @@
          else
              Py_DECREF(tmp);
      }
@@ -409,7 +410,7 @@
  
      if (ferr != NULL && ferr != Py_None && !file_is_closed(ferr)) {
          tmp = _PyObject_CallMethodId(ferr, &PyId_flush, "");
-@@ -612,8 +620,10 @@
+@@ -626,8 +634,10 @@
  
      /* Debugging stuff */
  #ifdef COUNT_ALLOCS
@@ -420,7 +421,7 @@
      /* dump hash stats */
      _PyHash_Fini();
  
-@@ -1179,25 +1179,37 @@
+@@ -1201,7 +1211,11 @@
      }
  
      /* Set sys.stdin */
@@ -432,8 +433,7 @@
      /* Under some conditions stdin, stdout and stderr may not be connected
       * and fileno() may point to an invalid file descriptor. For example
       * GUI apps don't have valid standard streams by default.
-      */
-     std = create_stdio(iomod, fd, 0, "<stdin>", encoding, errors);
+@@ -1210,16 +1224,24 @@
      if (std == NULL)
          goto error;
      PySys_SetObject("__stdin__", std);
@@ -458,7 +458,7 @@
      Py_DECREF(std);
  
  #if 1 /* Disable this if you have trouble debugging bootstrap stuff */
-@@ -1438,7 +1438,9 @@
+@@ -1476,7 +1498,9 @@
      while (nexitfuncs > 0)
          (*exitfuncs[--nexitfuncs])();
  

@@ -32,23 +32,23 @@
  PyAPI_FUNC(void) PyThread_ReInitTLS(void);
 --- Modules/_tracemalloc.c
 +++ Modules/_tracemalloc.c
-@@ -143,7 +143,7 @@
+@@ -165,7 +165,7 @@
  #  error "need native thread local storage (TLS)"
  #endif
  
--static int tracemalloc_reentrant_key;
-+static PyThread_type_key tracemalloc_reentrant_key;
+-static int tracemalloc_reentrant_key = -1;
++static PyThread_type_key tracemalloc_reentrant_key = -1;
  
  /* Any non-NULL pointer can be used */
  #define REENTRANT Py_True
 --- Python/pystate.c
 +++ Python/pystate.c
-@@ -37,7 +37,7 @@
+@@ -47,7 +47,7 @@
     GILState implementation
  */
  static PyInterpreterState *autoInterpreterState = NULL;
--static int autoTLSkey = 0;
-+static PyThread_type_key autoTLSkey = 0;
+-static int autoTLSkey = -1;
++static PyThread_type_key autoTLSkey = -1;
  #else
  #define HEAD_INIT() /* Nothing */
  #define HEAD_LOCK() /* Nothing */

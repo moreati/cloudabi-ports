@@ -62,9 +62,9 @@
                  const char *cfilename;
 --- Modules/zipimport.c
 +++ Modules/zipimport.c
-@@ -876,7 +876,11 @@ read_directory(PyObject *archive)
-     const char *charset;
+@@ -904,7 +904,11 @@
      int bootstrap;
+     const char *errmsg = NULL;
  
 +#ifdef HAVE_FOPEN
      fp = _Py_fopen_obj(archive, "rb");
@@ -74,7 +74,7 @@
      if (fp == NULL) {
          if (PyErr_ExceptionMatches(PyExc_OSError)) {
              PyObject *exc, *val, *tb;
-@@ -1082,7 +1086,11 @@ get_data(PyObject *archive, PyObject *toc_entry)
+@@ -1151,7 +1155,11 @@
          return NULL;
      }
  
@@ -83,9 +83,9 @@
 +#else
 +    fp = NULL;
 +#endif
-     if (!fp)
+     if (!fp) {
          return NULL;
- 
+     }
 --- Parser/pgenmain.c
 +++ Parser/pgenmain.c
 @@ -53,16 +53,24 @@
