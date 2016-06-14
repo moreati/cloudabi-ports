@@ -6,7 +6,7 @@
 import os
 
 def build(ctx):
-    srcdir = ctx.extract('cpython-d1f2fdde1a305911a04bbdc0558cddfadb3ffb39')
+    srcdir = ctx.extract('Python-3.6.0a2')
 
     # First build a native binary, this will be used by the cross-build
     # to generate some files (see also patch-makefile-regen)
@@ -52,9 +52,9 @@ package(
 )
 
 distfile(
-    name='cpython-d1f2fdde1a305911a04bbdc0558cddfadb3ffb39.zip',
-    checksum='2e333d169defd4612bc69525fbd1292e72c675cc08f3d896e91f31d988084ab0',
-    master_sites={'https://github.com/python/cpython/archive/'},
+    name='Python-3.6.0a2.tar.xz',
+    checksum='2dd2ddf22a63ef9642a20b1f5a40983209e8d7a8ad8371a881fde520edc9ff86',
+    master_sites={'https://www.python.org/ftp/python/3.6.0/'},
     unsafe_string_sources={
         'Modules/_ctypes/_ctypes.c',
         'Modules/_ctypes/_ctypes_test.c',
