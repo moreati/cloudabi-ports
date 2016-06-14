@@ -48,7 +48,7 @@
  #ifdef HAVE_SIGACTION
      (void)sigaction(handler->signum, &handler->previous, NULL);
 -#else
-+#elif HAVE_SIGNAL
++#elif defined(HAVE_SIGNAL)
      (void)signal(handler->signum, handler->previous);
  #endif
  }
@@ -57,7 +57,7 @@
  #endif
          err = sigaction(handler->signum, &action, &handler->previous);
 -#else
-+#elif HAVE_SIGNAL
++#elif defined(HAVE_SIGNAL)
          handler->previous = signal(handler->signum,
                  faulthandler_fatal_error);
          err = (handler->previous == SIG_ERR);
@@ -66,7 +66,7 @@
  #endif
      return sigaction(signum, &action, p_previous);
 -#else
-+#elif HAVE_SIGNAL
++#elif defined(HAVE_SIGNAL)
      _Py_sighandler_t previous;
      previous = signal(signum, faulthandler_user);
      if (p_previous != NULL)
@@ -75,7 +75,7 @@
          errno = save_errno;
      }
 -#else
-+#elif HAVE_SIGNAL
++#elif defined(HAVE_SIGNAL)
      if (user->chain) {
          errno = save_errno;
          /* call the previous signal handler */
@@ -84,7 +84,7 @@
  #ifdef HAVE_SIGACTION
      (void)sigaction(signum, &user->previous, NULL);
 -#else
-+#elif HAVE_SIGNAL
++#elif defined(HAVE_SIGNAL)
      (void)signal(signum, user->previous);
  #endif
      Py_CLEAR(user->file);
@@ -111,7 +111,7 @@
      int send_win_error;
  } wakeup = {INVALID_FD, 0, 0};
 -#else
-+#elif HAVE_SIG_ATOMIC_T
++#elif defined(HAVE_SIG_ATOMIC_T)
  #define INVALID_FD (-1)
  static volatile sig_atomic_t wakeup_fd = -1;
  #endif
@@ -381,7 +381,7 @@
          return SIG_ERR;
      return context.sa_handler;
 -#else
-+#elif HAVE_SIGNAL
++#elif defined(HAVE_SIGNAL)
      PyOS_sighandler_t handler;
  /* Special signal handling for the secure CRT in Visual Studio 2005 */
  #if defined(_MSC_VER) && _MSC_VER >= 1400
@@ -390,7 +390,7 @@
          return SIG_ERR;
      return ocontext.sa_handler;
 -#else
-+#elif HAVE_SIGNAL
++#elif defined(HAVE_SIGNAL)
      PyOS_sighandler_t oldhandler;
      oldhandler = signal(sig, handler);
  #ifdef HAVE_SIGINTERRUPT
