@@ -36,7 +36,7 @@
 +#ifdef HAVE_STAT
          result = STAT(path->narrow, &st);
 +#else
-+        result = -123456;
++        result = -23457;
 +#endif
      Py_END_ALLOW_THREADS
  
