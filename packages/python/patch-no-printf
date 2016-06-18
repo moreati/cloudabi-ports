@@ -309,6 +309,177 @@
 +                PyGrammar_LabelRepr(lb));
 +#endif
  }
+--- Parser/parser.c
++++ Parser/parser.c
+@@ -158,7 +158,7 @@ classify(parser_state *ps, int type, const char *str)
+             }
+ #endif
+ #endif
+-            D(printf("It's a keyword\n"));
++            D(fprintf(stderr, "It's a keyword\n"));
+             return n - i;
+         }
+     }
+@@ -168,13 +168,13 @@ classify(parser_state *ps, int type, const char *str)
+         int i;
+         for (i = n; i > 0; i--, l++) {
+             if (l->lb_type == type && l->lb_str == NULL) {
+-                D(printf("It's a token we know\n"));
++                D(fprintf(stderr, "It's a token we know\n"));
+                 return n - i;
+             }
+         }
+     }
+ 
+-    D(printf("Illegal token\n"));
++    D(fprintf(stderr, "Illegal token\n"));
+     return -1;
+ }
+ 
+@@ -230,7 +230,7 @@ PyParser_AddToken(parser_state *ps, int type, char *str,
+     int ilabel;
+     int err;
+ 
+-    D(printf("Token %s/'%s' ... ", _PyParser_TokenNames[type], str));
++    D(fprintf(stderr, "Token %s/'%s' ... ", _PyParser_TokenNames[type], str));
+ 
+     /* Find out which label this token is */
+     ilabel = classify(ps, type, str);
+@@ -243,7 +243,7 @@ PyParser_AddToken(parser_state *ps, int type, char *str,
+         dfa *d = ps->p_stack.s_top->s_dfa;
+         state *s = &d->d_state[ps->p_stack.s_top->s_state];
+ 
+-        D(printf(" DFA '%s', state %d:",
++        D(fprintf(stderr, " DFA '%s', state %d:",
+             d->d_name, ps->p_stack.s_top->s_state));
+ 
+         /* Check accelerator */
+@@ -258,25 +258,25 @@ PyParser_AddToken(parser_state *ps, int type, char *str,
+                         ps->p_grammar, nt);
+                     if ((err = push(&ps->p_stack, nt, d1,
+                         arrow, lineno, col_offset)) > 0) {
+-                        D(printf(" MemError: push\n"));
++                        D(fprintf(stderr, " MemError: push\n"));
+                         return err;
+                     }
+-                    D(printf(" Push ...\n"));
++                    D(fprintf(stderr, " Push ...\n"));
+                     continue;
+                 }
+ 
+                 /* Shift the token */
+                 if ((err = shift(&ps->p_stack, type, str,
+                                 x, lineno, col_offset)) > 0) {
+-                    D(printf(" MemError: shift.\n"));
++                    D(fprintf(stderr, " MemError: shift.\n"));
+                     return err;
+                 }
+-                D(printf(" Shift.\n"));
++                D(fprintf(stderr, " Shift.\n"));
+                 /* Pop while we are in an accept-only state */
+                 while (s = &d->d_state
+                                 [ps->p_stack.s_top->s_state],
+                     s->s_accept && s->s_narcs == 1) {
+-                    D(printf("  DFA '%s', state %d: "
++                    D(fprintf(stderr, "  DFA '%s', state %d: "
+                              "Direct pop.\n",
+                              d->d_name,
+                              ps->p_stack.s_top->s_state));
+@@ -290,7 +290,7 @@ PyParser_AddToken(parser_state *ps, int type, char *str,
+ #endif
+                     s_pop(&ps->p_stack);
+                     if (s_empty(&ps->p_stack)) {
+-                        D(printf("  ACCEPT.\n"));
++                        D(fprintf(stderr, "  ACCEPT.\n"));
+                         return E_DONE;
+                     }
+                     d = ps->p_stack.s_top->s_dfa;
+@@ -309,16 +309,16 @@ PyParser_AddToken(parser_state *ps, int type, char *str,
+ #endif
+             /* Pop this dfa and try again */
+             s_pop(&ps->p_stack);
+-            D(printf(" Pop ...\n"));
++            D(fprintf(stderr, " Pop ...\n"));
+             if (s_empty(&ps->p_stack)) {
+-                D(printf(" Error: bottom of stack.\n"));
++                D(fprintf(stderr, " Error: bottom of stack.\n"));
+                 return E_SYNTAX;
+             }
+             continue;
+         }
+ 
+         /* Stuck, report syntax error */
+-        D(printf(" Error.\n"));
++        D(fprintf(stderr, " Error.\n"));
+         if (expected_ret) {
+             if (s->s_lower == s->s_upper - 1) {
+                 /* Only one possible expected token */
+@@ -343,20 +343,20 @@ dumptree(grammar *g, node *n)
+     int i;
+ 
+     if (n == NULL)
+-        printf("NIL");
++        fprintf(stderr, "NIL");
+     else {
+         label l;
+         l.lb_type = TYPE(n);
+         l.lb_str = STR(n);
+-        printf("%s", PyGrammar_LabelRepr(&l));
++        fprintf(stderr, "%s", PyGrammar_LabelRepr(&l));
+         if (ISNONTERMINAL(TYPE(n))) {
+-            printf("(");
++            fprintf(stderr, "(");
+             for (i = 0; i < NCH(n); i++) {
+                 if (i > 0)
+-                    printf(",");
++                    fprintf(stderr, ",");
+                 dumptree(g, CHILD(n, i));
+             }
+-            printf(")");
++            fprintf(stderr, ")");
+         }
+     }
+ }
+@@ -373,29 +373,29 @@ showtree(grammar *g, node *n)
+             showtree(g, CHILD(n, i));
+     }
+     else if (ISTERMINAL(TYPE(n))) {
+-        printf("%s", _PyParser_TokenNames[TYPE(n)]);
++        fprintf(stderr, "%s", _PyParser_TokenNames[TYPE(n)]);
+         if (TYPE(n) == NUMBER || TYPE(n) == NAME)
+-            printf("(%s)", STR(n));
+-        printf(" ");
++            fprintf(stderr, "(%s)", STR(n));
++        fprintf(stderr, " ");
+     }
+     else
+-        printf("? ");
++        fprintf(stderr, "? ");
+ }
+ 
+ void
+ printtree(parser_state *ps)
+ {
+     if (Py_DebugFlag) {
+-        printf("Parse tree:\n");
++        fprintf(stderr, "Parse tree:\n");
+         dumptree(ps->p_grammar, ps->p_tree);
+-        printf("\n");
+-        printf("Tokens:\n");
++        fprintf(stderr, "\n");
++        fprintf(stderr, "Tokens:\n");
+         showtree(ps->p_grammar, ps->p_tree);
+-        printf("\n");
++        fprintf(stderr, "\n");
+     }
+-    printf("Listing:\n");
++    fprintf(stderr, "Listing:\n");
+     PyNode_ListTree(ps->p_tree);
+-    printf("\n");
++    fprintf(stderr, "\n");
+ }
+ 
+ #endif /* Py_DEBUG */
 --- Parser/pgen.c
 +++ Parser/pgen.c
 @@ -153,8 +153,8 @@ metacompile(node *n)
