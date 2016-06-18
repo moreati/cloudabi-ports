@@ -1,0 +1,15 @@
+--- Programs/python.c
++++ Programs/python.c
+@@ -18,6 +18,12 @@ wmain(int argc, wchar_t **argv)
+ int
+ main(int argc, char **argv)
+ {
++#ifdef __CloudABI__
++    FILE *fp0 = fdopen(0, "r");
++    FILE *fp1 = fdopen(1, "w");
++    FILE *fp2 = fdopen(2, "w");
++    fswap(stderr, fp2);
++#endif
+     wchar_t **argv_copy;
+     /* We need a second copy, as Python might modify the first one. */
+     wchar_t **argv_copy2;
