@@ -25,7 +25,7 @@ def build(ctx):
         'ac_cv_have_long_long_format=yes',
         'ac_cv_posix_semaphores_enabled=no',
         'CPPFLAGS=-static',
-        'LDFLAGS=-static -static-libgcc',
+        'LDFLAGS=-static',
         'PYTHON_FOR_BUILD=_PYTHON_PROJECT_BASE=$(abs_builddir) '
                          '_PYTHON_HOST_PLATFORM=$(_PYTHON_HOST_PLATFORM) '
                          'PYTHONPATH=$(shell test -f pybuilddir.txt '
