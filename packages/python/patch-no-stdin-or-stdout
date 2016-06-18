@@ -55,12 +55,14 @@
      char *p;
  #ifdef MS_WINDOWS
      wchar_t *wp;
-@@ -582,7 +582,9 @@
+@@ -582,7 +582,11 @@
          filename = argv[_PyOS_optind];
      }
  
 +#ifndef __CloudABI__
      stdin_is_interactive = Py_FdIsInteractive(stdin, (char *)0);
++#else
++    stdin_is_interactive = 0;
 +#endif
  
  #if defined(MS_WINDOWS) || defined(__CYGWIN__)
