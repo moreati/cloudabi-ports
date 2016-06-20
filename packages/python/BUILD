@@ -37,10 +37,7 @@ def build(ctx):
     with srcdir.diff('/home/edje/python.diff'):
         build.debug_shell()
 
-    build.make([
-        '--assume-new=Parser/pgen',
-        '--assume-new=Programs/_freeze_importlib',
-    ])
+    build.make()
     install = build.make_install()
     install.install()
 
