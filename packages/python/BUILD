@@ -10,11 +10,11 @@ def build(ctx):
 
     # First build a native binary, this will be used by the cross-build
     # to generate some files (see also patch-makefile-regen)
-    hostbuild = srcdir.host().autoconf()
+    hostbuild = srcdir.host().gnu_configure()
     hostbuild.make()
 
-    build = srcdir.autoconf([
         '--build=x86_64-unknown-freebsd',
+    build = srcdir.gnu_configure([
         '--disable-shared',
         '--without-ensurepip',
         '--with-pydebug',
