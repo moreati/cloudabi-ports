@@ -1,5 +1,175 @@
+--- Include/Python.h
++++ Include/Python.h
+@@ -45,6 +45,11 @@
+ #include <stddef.h>
+ #endif
+ 
++#ifdef __CloudABI__
++#include <program.h>
++#include <argdata.h>
++#endif
++
+ /* CAUTION:  Build setups should ensure that NDEBUG is defined on the
+  * compiler command line when building Python in release mode; else
+  * assert() calls won't be removed.
+--- Include/pylifecycle.h
++++ Include/pylifecycle.h
+@@ -50,6 +50,10 @@ PyAPI_FUNC(void) _Py_RestoreSignals(void);
+ PyAPI_FUNC(int) Py_FdIsInteractive(FILE *, const char *);
+ #endif
+ 
++#ifdef __CloudABI__
++PyAPI_FUNC(void) Py_ProgramMain(const argdata_t *ad);
++#endif
++
+ /* Bootstrap __main__ (defined in Modules/main.c) */
+ PyAPI_FUNC(int) Py_Main(int argc, wchar_t **argv);
+ 
+--- Modules/main.c
++++ Modules/main.c
+@@ -25,6 +26,12 @@
+ 
+ #include "pygetopt.h"
+ 
++#ifdef __CloudABI__
++#include <argdata.h>
++#include <dirent.h>
++#include <program.h>
++#endif
++
+ #define COPYRIGHT \
+     "Type \"help\", \"copyright\", \"credits\" or \"license\" " \
+     "for more information."
+@@ -33,6 +38,113 @@
+ extern "C" {
+ #endif
+ 
++#ifdef __CloudABI__
++void
++Py_ProgramMain(const argdata_t *ad)
++{
++    int c;
++    int sts;
++    wchar_t *command = NULL;
++    wchar_t *filename = NULL;
++    wchar_t *module = NULL;
++    char *p;
++    int skipfirstline = 0;
++    int stdin_is_interactive = 0;
++    int help = 0;
++    int version = 0;
++    int saw_unbuffered_flag = 0;
++    char *opt;
++    DIR *d = NULL;
++
++    argdata_map_iterator_t it;
++    const argdata_t *key, *val;
++
++    PyCompilerFlags cf;
++    PyObject *warning_option = NULL;
++    PyObject *warning_options = NULL;
++
++    /* Force malloc() allocator to bootstrap Python */
++    (void)_PyMem_SetupAllocators("malloc");
++
++    cf.cf_flags = 0;
++
++    if (_PyMem_SetupAllocators(NULL) < 0) {
++        exit(1);
++    }
++
++    Py_HashRandomizationFlag = 1;
++    _PyRandom_Init();
++
++    PySys_ResetWarnOptions();
++
++    argdata_map_iterate(ad, &it);
++    while (argdata_map_next(&it, &key, &val)) {
++        const char *keystr;
++        argdata_get_str_c(key, &keystr);
++
++        if (strcmp(keystr, "stderr") == 0) {
++            int fd;
++            FILE *fp;
++            if (argdata_get_fd(val, &fd) == 0) {
++                fp = fdopen(fd, "w");
++                fswap(stderr, fp);
++            }
++        }
++        else if (strcmp(keystr, "path") == 0) {
++            int fd;
++            if (argdata_get_fd(val, &fd) == 0) {
++                fprintf(stderr, "pathfd: %d\n", fd);
++                d = fdopendir(fd);
++            }
++        }
++        else if (strcmp(keystr, "c") == 0 || strcmp(keystr, "command") == 0) {
++            size_t len;
++            const char *valstr;
++            wchar_t *valwstr;
++            argdata_get_str_c(val, &valstr);
++            valwstr = Py_DecodeLocale(valstr, NULL);
++            if (!valwstr) {
++                fprintf(stderr, "Fatal Python error: "
++                                "unable to decode the 'command' argument\n");
++            }
++            len = wcslen(valwstr) + 1 + 1;
++            command = (wchar_t *)PyMem_RawMalloc(sizeof(wchar_t) * len);
++            if (command == NULL)
++                Py_FatalError(
++                   "not enough memory to copy  argument");
++            wcscpy(command, valwstr);
++            command[len - 2] = '\n';
++            command[len - 1] = 0;
++        }
++    }
++    fprintf(stderr, "path: %d\n", d);
++
++    Py_Initialize();
++    Py_XDECREF(warning_options);
++
++    if (!Py_QuietFlag && (Py_VerboseFlag ||
++                        (command == NULL && filename == NULL &&
++                         module == NULL && stdin_is_interactive))) {
++        fprintf(stderr, "Python %s on %s\n",
++            Py_GetVersion(), Py_GetPlatform());
++        if (!Py_NoSiteFlag)
++            fprintf(stderr, "%s\n", COPYRIGHT);
++    }
++
++    if (Py_FinalizeEx() < 0) {
++        /* Value unlikely to be confused with a non-error exit status or
++        other special meaning */
++        sts = 120;
++    }
++
++    /* Force again malloc() allocator to release memory blocks allocated
++       before Py_Main() */
++    (void)_PyMem_SetupAllocators("malloc");
++
++    exit(sts);
++}
++#endif /* __CloudABI__ */
++
+ /* For Py_GetArgcArgv(); set by main() */
+ static wchar_t **orig_argv;
+ static int  orig_argc;
 --- Programs/python.c
 +++ Programs/python.c
+@@ -7,6 +7,13 @@
+ #include <fenv.h>
+ #endif
+ 
++#ifdef __CloudABI__
++void
++program_main(const argdata_t *ad) {
++    Py_ProgramMain(ad);
++}
++#endif /* __CloudABI__ */
++
+ #ifdef MS_WINDOWS
+ int
+ wmain(int argc, wchar_t **argv)
 @@ -18,6 +18,12 @@ wmain(int argc, wchar_t **argv)
  int
  main(int argc, char **argv)
