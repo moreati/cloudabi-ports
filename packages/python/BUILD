@@ -8,6 +8,11 @@ import os
 def build(ctx):
     srcdir = ctx.extract('Python-3.6.0a2')
 
+    # Delete the in-tree copy of these, to make certain the out-of-tree
+    # versions are used, i.e. those generated from our patched importlib
+    os.unlink(os.path.join(str(srcdir), 'Python', 'importlib.h'))
+    os.unlink(os.path.join(str(srcdir), 'Python', 'importlib_external.h'))
+
     # First build a native binary, this will be used by the cross-build
     # to generate some files (see also patch-makefile-regen)
     hostbuild = srcdir.host().gnu_configure()

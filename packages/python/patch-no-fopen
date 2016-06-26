@@ -125,32 +125,6 @@
      if (fp == NULL) {
          perror(filename);
          Py_Exit(1);
---- Programs/_freeze_importlib.c
-+++ Programs/_freeze_importlib.c
-@@ -49,7 +49,11 @@
-     }
-     inpath = argv[1];
-     outpath = argv[2];
-+#ifdef HAVE_FOPEN
-     infile = fopen(inpath, "rb");
-+#else
-+    infile = NULL;
-+#endif
-     if (infile == NULL) {
-         fprintf(stderr, "cannot open '%s' for reading\n", inpath);
-         goto error;
-@@ -106,7 +110,11 @@
- 
-     /* Open the file in text mode. The hg checkout should be using the eol extension,
-        which in turn should cause the EOL style match the C library's text mode */
-+#ifdef HAVE_FOPEN
-     outfile = fopen(outpath, "w");
-+#else
-+    outfile = NULL;
-+#endif
-     if (outfile == NULL) {
-         fprintf(stderr, "cannot open '%s' for writing\n", outpath);
-         goto error;
 --- Python/pythonrun.c
 +++ Python/pythonrun.c
 @@ -372,7 +372,11 @@
