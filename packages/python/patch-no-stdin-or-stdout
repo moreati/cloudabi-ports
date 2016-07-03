@@ -67,35 +67,29 @@
  
  #if defined(MS_WINDOWS) || defined(__CYGWIN__)
      /* don't translate newlines (\r\n <=> \n) */
-@@ -614,12 +614,20 @@
+@@ -614,12 +614,16 @@
  
      if (Py_UnbufferedStdioFlag) {
  #ifdef HAVE_SETVBUF
 +#ifndef __CloudABI__
          setvbuf(stdin,  (char *)NULL, _IONBF, BUFSIZ);
-+#endif
-+#ifndef __CloudABI__
          setvbuf(stdout, (char *)NULL, _IONBF, BUFSIZ);
 +#endif
          setvbuf(stderr, (char *)NULL, _IONBF, BUFSIZ);
  #else /* !HAVE_SETVBUF */
 +#ifndef __CloudABI__
          setbuf(stdin,  (char *)NULL);
-+#endif
-+#ifndef __CloudABI__
          setbuf(stdout, (char *)NULL);
 +#endif
          setbuf(stderr, (char *)NULL);
  #endif /* !HAVE_SETVBUF */
      }
-@@ -630,8 +638,12 @@
+@@ -630,8 +638,10 @@
          setvbuf(stdout, (char *)NULL, _IONBF, BUFSIZ);
  #else /* !MS_WINDOWS */
  #ifdef HAVE_SETVBUF
 +#ifndef __CloudABI__
          setvbuf(stdin,  (char *)NULL, _IOLBF, BUFSIZ);
-+#endif
-+#ifndef __CloudABI__
          setvbuf(stdout, (char *)NULL, _IOLBF, BUFSIZ);
 +#endif
  #endif /* HAVE_SETVBUF */
@@ -423,43 +417,32 @@
      /* dump hash stats */
      _PyHash_Fini();
  
-@@ -1201,7 +1211,11 @@
+@@ -1200,6 +1228,7 @@
+         }
      }
  
++#ifndef __CloudABI__
      /* Set sys.stdin */
-+#ifndef __CloudABI__
      fd = fileno(stdin);
-+#else
-+    fd = fileno(NULL);
-+#endif
      /* Under some conditions stdin, stdout and stderr may not be connected
-      * and fileno() may point to an invalid file descriptor. For example
-      * GUI apps don't have valid standard streams by default.
-@@ -1210,16 +1224,24 @@
-     if (std == NULL)
-         goto error;
+@@ -1212,7 +1241,9 @@
      PySys_SetObject("__stdin__", std);
-+#ifndef __CloudABI__
      _PySys_SetObjectId(&PyId_stdin, std);
-+#endif
      Py_DECREF(std);
++#endif
  
++#ifndef __CloudABI__
      /* Set sys.stdout */
-+#ifndef __CloudABI__
      fd = fileno(stdout);
-+#else
-+    fd = fileno(NULL);
-+#endif
      std = create_stdio(iomod, fd, 1, "<stdout>", encoding, errors);
-     if (std == NULL)
-         goto error;
+@@ -1221,6 +1252,7 @@
      PySys_SetObject("__stdout__", std);
-+#ifndef __CloudABI__
      _PySys_SetObjectId(&PyId_stdout, std);
-+#endif
      Py_DECREF(std);
++#endif
  
  #if 1 /* Disable this if you have trouble debugging bootstrap stuff */
+     /* Set sys.stderr, replaces the preliminary stderr */
 @@ -1476,7 +1498,9 @@
      while (nexitfuncs > 0)
          (*exitfuncs[--nexitfuncs])();
@@ -485,22 +468,22 @@
  _Py_IDENTIFIER(stderr);
  _Py_static_string(PyId_string, "<string>");
  
-@@ -165,9 +165,15 @@
+@@ -165,6 +165,7 @@
          return -1;
      }
  
 +#ifndef __CloudABI__
      if (fp == stdin) {
-+#else
-+    if (0) {
-+#endif
          /* Fetch encoding from sys.stdin if possible. */
-+#ifndef __CloudABI__
          v = _PySys_GetObjectId(&PyId_stdin);
+@@ -186,6 +181,7 @@
+                 PyErr_Clear();
+         }
+     }
 +#endif
-         if (v && v != Py_None) {
-             oenc = _PyObject_GetAttrId(v, &PyId_encoding);
-             if (oenc)
+     v = _PySys_GetObjectId(&PyId_ps1);
+     if (v != NULL) {
+         v = PyObject_Str(v);
 @@ -557,7 +557,9 @@
          return;
  
@@ -531,18 +514,22 @@
      type = (PyObject *) Py_TYPE(value);
      tb = PyException_GetTraceback(value);
      if (tb && tb != Py_None)
-@@ -960,7 +966,11 @@
+@@ -960,6 +966,7 @@
          else
              PyErr_Clear();
      }
 +#ifndef __CloudABI__
      f = _PySys_GetObjectId(&PyId_stdout);
-+#else
-+    f = NULL;
-+#endif
      if (f != NULL) {
          r = _PyObject_CallMethodId(f, &PyId_flush, "");
-         if (r)
+@@ -984,6 +977,7 @@
+         else
+             PyErr_Clear();
+     }
++#endif
+ 
+     PyErr_Restore(type, value, traceback);
+ }
 --- Python/sysmodule.c
 +++ Python/sysmodule.c
 @@ -43,7 +43,9 @@
