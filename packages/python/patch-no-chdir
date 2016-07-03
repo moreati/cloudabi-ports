@@ -48,7 +48,7 @@
 +#ifdef HAVE_CHDIR
          result = chdir(path->narrow);
 +#else
-+        result = -3456;
++        {result = -1; errno = ENAMETOOLONG;}
 +#endif
  #endif
      Py_END_ALLOW_THREADS

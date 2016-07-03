@@ -17,7 +17,7 @@
 +#ifdef HAVE_RENAME
          result = rename(src->narrow, dst->narrow);
 +#else
-+        result = -4444;
++        {result = -1; errno = EMLINK;}
 +#endif /* HAVE_RENAME */
      Py_END_ALLOW_THREADS
  

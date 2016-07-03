@@ -18,7 +18,7 @@
 +#ifdef HAVE_RMDIR
          result = rmdir(path->narrow);
 +#else
-+        result = -5555;
++        {result = -1; errno = EFAULT;}
 +#endif /* HAVE_RMDIR */
  #endif
      Py_END_ALLOW_THREADS

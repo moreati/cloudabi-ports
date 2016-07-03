@@ -17,7 +17,7 @@
 +#ifdef HAVE_UNLINK
          result = unlink(path->narrow);
 +#else
-+        result = -6666;
++        {result = -1; EFAULT;}
 +#endif /* HAVE_UNLINK */
  #endif
      _Py_END_SUPPRESS_IPH
