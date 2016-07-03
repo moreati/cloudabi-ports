@@ -1,21 +1,3 @@
---- Modules/clinic/posixmodule.c.h
-+++ Modules/clinic/posixmodule.c.h
-@@ -89,6 +89,7 @@
-     return return_value;
- }
- 
-+#ifdef HAVE_ACCESS
- PyDoc_STRVAR(os_access__doc__,
- "access($module, /, path, mode, *, dir_fd=None, effective_ids=False,\n"
- "       follow_symlinks=True)\n"
-@@ -154,6 +155,7 @@
- 
-     return return_value;
- }
-+#endif /* HAVE_ACCESS */
- 
- #if defined(HAVE_TTYNAME)
- 
 --- Modules/posixmodule.c
 +++ Modules/posixmodule.c
 @@ -2626,7 +2626,11 @@
