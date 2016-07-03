@@ -1,5 +1,16 @@
 --- Modules/_localemodule.c
 +++ Modules/_localemodule.c
+@@ -44,8 +44,10 @@
+ 
+ /* support functions for formatting floating point numbers */
+ 
++#ifdef HAVE_SETLOCALE
+ PyDoc_STRVAR(setlocale__doc__,
+ "(integer,string=None) -> string. Activates/queries locale processing.");
++#endif /* HAVE_LOCALE */
+ 
+ /* the grouping is terminated by either 0 or CHAR_MAX */
+ static PyObject*
 @@ -86,6 +86,7 @@
      return result;
  }
