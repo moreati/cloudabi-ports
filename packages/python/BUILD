@@ -4,6 +4,7 @@
 # See the LICENSE file for details.
 
 import os
+import sysconfig
 
 def build(ctx):
     srcdir = ctx.extract('Python-3.6.0a2')
@@ -18,8 +19,8 @@ def build(ctx):
     hostbuild = srcdir.host().gnu_configure()
     hostbuild.make()
 
-        '--build=x86_64-unknown-freebsd',
     build = srcdir.gnu_configure([
+        '--build=%s' % sysconfig.get_platform(),
         '--disable-shared',
         '--without-ensurepip',
         '--with-pydebug',
