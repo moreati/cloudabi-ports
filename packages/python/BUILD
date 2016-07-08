@@ -39,8 +39,6 @@ def build(ctx):
                                     '$(srcdir)/Lib/$(PLATDIR) '
                          '%s' % os.path.join(str(hostbuild), 'python'),
     ])
-    with srcdir.diff('/home/edje/python.diff'):
-        build.debug_shell()
 
     build.make()
     install = build.make_install()
