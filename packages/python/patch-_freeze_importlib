@@ -1,7 +1,5 @@
-diff --git a/Programs/_freeze_importlib.c b/Programs/_freeze_importlib.c
-index fbe65eb..963b21f 100644
---- a/Programs/_freeze_importlib.c
-+++ b/Programs/_freeze_importlib.c
+--- Programs/_freeze_importlib.c
++++ Programs/_freeze_importlib.c
 @@ -29,7 +29,11 @@ const struct _frozen *PyImport_FrozenModules;
  int
  main(int argc, char *argv[])

@@ -1,6 +1,5 @@
-diff --git a/Parser/pgenmain.c b/Parser/pgenmain.c
---- a/Parser/pgenmain.c
-+++ b/Parser/pgenmain.c
+--- Parser/pgenmain.c
++++ Parser/pgenmain.c
 @@ -33,22 +33,23 @@ void Py_Exit(int) _Py_NO_RETURN;
  
  void
@@ -27,9 +26,8 @@ diff --git a/Parser/pgenmain.c b/Parser/pgenmain.c
      FILE *fp;
      char *filename, *graminit_h, *graminit_c;
  
-diff --git a/Python/pylifecycle.c b/Python/pylifecycle.c
---- a/Python/pylifecycle.c
-+++ b/Python/pylifecycle.c
+--- Python/pylifecycle.c
++++ Python/pylifecycle.c
 @@ -743,17 +743,19 @@ Py_NewInterpreter(void)
      PyThreadState *tstate, *save_tstate;
      PyObject *bimod, *sysmod;
@@ -50,9 +48,8 @@ diff --git a/Python/pylifecycle.c b/Python/pylifecycle.c
      tstate = PyThreadState_New(interp);
      if (tstate == NULL) {
          PyInterpreterState_Delete(interp);
-diff --git a/Python/traceback.c b/Python/traceback.c
---- a/Python/traceback.c
-+++ b/Python/traceback.c
+--- Python/traceback.c
++++ Python/traceback.c
 @@ -740,17 +740,17 @@ const char*
          else {
              interp = current_tstate->interp;
