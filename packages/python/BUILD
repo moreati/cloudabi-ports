@@ -3,7 +3,6 @@
 # This file is distributed under a 2-clause BSD license.
 # See the LICENSE file for details.
 
-import os
 import sysconfig
 
 def build(ctx):
@@ -11,8 +10,8 @@ def build(ctx):
 
     # Delete the in-tree copy of these, to make certain the out-of-tree
     # versions are used, i.e. those generated from our patched importlib
-    os.unlink(os.path.join(str(srcdir), 'Python', 'importlib.h'))
-    os.unlink(os.path.join(str(srcdir), 'Python', 'importlib_external.h'))
+    srcdir.path('Python/importlib.h').remove()
+    srcdir.path('Python/importlib_external.h').remove()
 
     # First build a native binary, this will be used by the cross-build
     # to generate some files (see also patch-makefile-regen)
@@ -38,7 +37,7 @@ def build(ctx):
                                             '&& echo $(abs_builddir)/`cat pybuilddir.txt`:)'
                                     '$(srcdir)/Lib:'
                                     '$(srcdir)/Lib/$(PLATDIR) '
-                         '%s' % os.path.join(str(hostbuild), 'python'),
+                         '%s' % hostbuild.path('python'),
     ])
 
     build.make()
