@@ -36,7 +36,7 @@
 +#if defined(HAVE_LINK)
          result = link(src->narrow, dst->narrow);
 +#else
-+        {result = -1; errno = EFAULT;}
++        {result = -1; errno = ENOSYS;}
 +#endif /* defined(HAVE_LINK) */
      Py_END_ALLOW_THREADS
  

@@ -25,7 +25,7 @@
 +#ifdef HAVE_CHDIR
          result = chdir(path->narrow);
 +#else
-+        {result = -1; errno = ENAMETOOLONG;}
++        {result = -1; errno = ENOSYS;}
 +#endif
  #endif
      Py_END_ALLOW_THREADS

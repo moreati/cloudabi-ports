@@ -7,7 +7,7 @@
 +#ifdef HAVE_STAT
      err = stat(fname, buf);
 +#else
-+    {err = -1; errno = EFAULT;}
++    {err = -1; errno = ENOSYS;}
 +#endif
      PyMem_Free(fname);
 +    
@@ -48,7 +48,7 @@
 +#ifdef HAVE_STAT
          result = STAT(path, &st);
 +#else
-+        {result = -1; errno = ENOTSUP;}
++        {result = -1; errno = ENOSYS;}
 +#endif /* HAVE_STAT */
      else
 +#ifdef HAVE_LSTAT
@@ -69,7 +69,7 @@
          rv = _Py_stat(filename, &statbuf);
 +#else
 +        rv = -1;
-+        errno = EOVERFLOW;
++        errno = ENOSYS;
 +#endif /* HAVE_STAT */
          if (rv == -2)
              goto error;

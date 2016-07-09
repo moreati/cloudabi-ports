@@ -7,7 +7,7 @@
 +#ifdef HAVE_MKDIR
          result = mkdir(path->narrow, mode);
 +#else
-+        {result = -1; errno = EFAULT;}
++        {result = -1; errno = ENOSYS;}
 +#endif /* HAVE_MKDIR */
  #endif
      Py_END_ALLOW_THREADS

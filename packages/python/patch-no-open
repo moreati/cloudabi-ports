@@ -82,7 +82,7 @@
 +#ifdef HAVE_OPEN
                      self->fd = open(name, flags, 0666);
 +#else
-+                    {self->fd = -1; errno = ENFILE;}
++                    {self->fd = -1; errno = ENOSYS;}
 +#endif /* HAVE_OPEN */
                  Py_END_ALLOW_THREADS
              } while (self->fd < 0 && errno == EINTR &&
@@ -96,7 +96,7 @@
 +#ifdef HAVE_OPEN
              fd = open(path->narrow, flags, mode);
 +#else
-+            {fd = -1; errno = ENOMEM;}
++            {fd = -1; errno = ENOSYS;}
 +#endif /* HAVE_OPEN */
          Py_END_ALLOW_THREADS
      } while (fd < 0 && errno == EINTR && !(async_err = PyErr_CheckSignals()));

@@ -8,7 +8,7 @@
      pid = fork();
 +#else
 +    pid = -1;
-+    errno = ENOTSUP;
++    errno = ENOSYS;
 +#endif
      if (pid == 0) {
          /* Child process */

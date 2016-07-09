@@ -7,7 +7,7 @@
 +#ifdef HAVE_RMDIR
          result = rmdir(path->narrow);
 +#else
-+        {result = -1; errno = EFAULT;}
++        {result = -1; errno = ENOSYS;}
 +#endif /* HAVE_RMDIR */
  #endif
      Py_END_ALLOW_THREADS

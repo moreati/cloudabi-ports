@@ -7,13 +7,13 @@
 +#ifdef HAVE_EXECVE
              execve(executable, argv, envp);
 +#else
-+            errno = ENAMETOOLONG;
++            errno = ENOSYS;
 +#endif
          } else {
 +#ifdef HAVE_EXECV
              execv(executable, argv);
 +#else
-+            errno = EPROTONOSUPPORT;
++            errno = ENOSYS;
 +#endif
          }
          if (errno != ENOENT && errno != ENOTDIR && saved_errno == 0) {
