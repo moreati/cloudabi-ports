@@ -1,17 +1,6 @@
 --- Modules/posixmodule.c
 +++ Modules/posixmodule.c
-@@ -201,8 +201,10 @@
- #ifdef HAVE_CHDIR
- extern int chdir(const char *);
- #endif
-+#ifdef HAVE_RMDIR
- extern int rmdir(const char *);
- #endif
-+#endif
- #ifdef HAVE_CHMOD
- extern int chmod(const char *, mode_t);
- #endif
-@@ -4278,7 +4280,11 @@
+@@ -4256,7 +4256,11 @@
          result = unlinkat(dir_fd, path->narrow, AT_REMOVEDIR);
      else
  #endif

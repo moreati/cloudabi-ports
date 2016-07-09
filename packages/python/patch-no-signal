@@ -1,6 +1,6 @@
 --- Modules/clinic/signalmodule.c.h
 +++ Modules/clinic/signalmodule.c.h
-@@ -58,6 +58,7 @@
+@@ -60,6 +60,7 @@
  
  #endif /* defined(HAVE_PAUSE) */
  
@@ -8,7 +8,7 @@
  PyDoc_STRVAR(signal_signal__doc__,
  "signal($module, signalnum, handler, /)\n"
  "--\n"
-@@ -92,7 +93,9 @@
+@@ -95,7 +96,9 @@
  exit:
      return return_value;
  }
@@ -18,7 +18,7 @@
  PyDoc_STRVAR(signal_getsignal__doc__,
  "getsignal($module, signalnum, /)\n"
  "--\n"
-@@ -124,6 +127,7 @@
+@@ -128,6 +131,7 @@
  exit:
      return return_value;
  }
@@ -26,7 +26,7 @@
  
  #if defined(HAVE_SIGINTERRUPT)
  
-@@ -394,6 +398,14 @@
+@@ -404,6 +408,14 @@
      #define SIGNAL_PAUSE_METHODDEF
  #endif /* !defined(SIGNAL_PAUSE_METHODDEF) */
  
@@ -52,7 +52,7 @@
      (void)signal(handler->signum, handler->previous);
  #endif
  }
-@@ -447,7 +447,7 @@ faulthandler_enable(void)
+@@ -447,7 +447,7 @@
          }
  #endif
          err = sigaction(handler->signum, &action, &handler->previous);
@@ -90,8 +90,8 @@
      Py_CLEAR(user->file);
 --- Modules/signalmodule.c
 +++ Modules/signalmodule.c
-@@ -94,10 +94,15 @@
- # endif
+@@ -92,10 +92,15 @@
+ static pid_t main_pid;
  #endif
  
 +#ifdef HAVE_SIGNAL
@@ -106,7 +106,7 @@
  
  #ifdef MS_WINDOWS
  #define INVALID_FD ((SOCKET_T)-1)
-@@ -109,13 +111,15 @@
+@@ -107,13 +112,15 @@
      int send_errno;
      int send_win_error;
  } wakeup = {INVALID_FD, 0, 0};
@@ -123,7 +123,7 @@
  
  static PyObject *DefaultHandler;
  static PyObject *IgnoreHandler;
-@@ -126,7 +130,9 @@
+@@ -124,7 +131,9 @@
     SIG_DFL as (void (*)())0; the correct declaration would have been
     (void (*)(int))0. */
  
@@ -133,7 +133,7 @@
  
  #ifdef MS_WINDOWS
  static HANDLE sigint_event = NULL;
-@@ -237,6 +243,7 @@
+@@ -235,6 +244,7 @@
  }
  #endif   /* MS_WINDOWS */
  
@@ -141,7 +141,7 @@
  static void
  trip_signal(int sig_num)
  {
-@@ -291,7 +299,9 @@
+@@ -289,7 +299,9 @@
          Py_AddPendingCall(checksignals_witharg, NULL);
      }
  }
@@ -151,7 +151,7 @@
  static void
  signal_handler(int sig_num)
  {
-@@ -328,7 +338,8 @@
+@@ -326,6 +338,7 @@
          SetEvent(sigint_event);
  #endif
  }
@@ -159,8 +159,7 @@
  
  
  #ifdef HAVE_ALARM
- 
-@@ -395,6 +405,7 @@
+@@ -393,6 +406,7 @@
  the first is the signal number, the second is the interrupted stack frame.
  [clinic start generated code]*/
  
@@ -168,7 +167,7 @@
  static PyObject *
  signal_signal_impl(PyModuleDef *module, int signalnum, PyObject *handler)
  /*[clinic end generated code: output=622d7d0beebea546 input=deee84af5fa0432c]*/
-@@ -456,7 +467,8 @@
+@@ -454,6 +468,7 @@
      else
          Py_RETURN_NONE;
  }
@@ -176,8 +175,7 @@
  
  
  /*[clinic input]
- signal.getsignal
-@@ -473,6 +484,7 @@
+@@ -471,6 +486,7 @@
    anything else -- the callable Python object used as a handler
  [clinic start generated code]*/
  
@@ -185,7 +183,7 @@
  static PyObject *
  signal_getsignal_impl(PyModuleDef *module, int signalnum)
  /*[clinic end generated code: output=d50ec355757e360c input=ac23a00f19dfa509]*/
-@@ -492,6 +504,7 @@
+@@ -490,6 +506,7 @@
          Py_RETURN_NONE;
      }
  }
@@ -193,8 +191,7 @@
  
  #ifdef HAVE_SIGINTERRUPT
  
-@@ -526,7 +539,8 @@
- 
+@@ -525,6 +542,7 @@
  #endif
  
  
@@ -202,7 +199,7 @@
  static PyObject*
  signal_set_wakeup_fd(PyObject *self, PyObject *args)
  {
-@@ -636,7 +649,9 @@
+@@ -634,7 +652,9 @@
      return PyLong_FromLong(old_fd);
  #endif
  }
@@ -212,7 +209,7 @@
  PyDoc_STRVAR(set_wakeup_fd_doc,
  "set_wakeup_fd(fd) -> fd\n\
  \n\
-@@ -663,6 +678,7 @@
+@@ -661,6 +681,7 @@
  #endif
      return old_fd;
  }
@@ -220,7 +217,9 @@
  
  
  #ifdef HAVE_SETITIMER
-@@ -1131,7 +1147,9 @@
+@@ -1127,9 +1148,11 @@
+     SIGNAL_ALARM_METHODDEF
+     SIGNAL_SETITIMER_METHODDEF
      SIGNAL_GETITIMER_METHODDEF
 +#ifdef HAVE_SIGNAL
      SIGNAL_SIGNAL_METHODDEF
@@ -230,7 +229,7 @@
      SIGNAL_SIGINTERRUPT_METHODDEF
      SIGNAL_PAUSE_METHODDEF
      SIGNAL_PTHREAD_KILL_METHODDEF
-@@ -1223,6 +1241,7 @@
+@@ -1219,6 +1242,7 @@
      /* Add some symbolic constants to the module */
      d = PyModule_GetDict(m);
  
@@ -238,7 +237,7 @@
      x = DefaultHandler = PyLong_FromVoidPtr((void *)SIG_DFL);
      if (!x || PyDict_SetItemString(d, "SIG_DFL", x) < 0)
          goto finally;
-@@ -1230,6 +1249,7 @@
+@@ -1226,6 +1250,7 @@
      x = IgnoreHandler = PyLong_FromVoidPtr((void *)SIG_IGN);
      if (!x || PyDict_SetItemString(d, "SIG_IGN", x) < 0)
          goto finally;
@@ -246,7 +245,7 @@
  
      x = PyLong_FromLong((long)NSIG);
      if (!x || PyDict_SetItemString(d, "NSIG", x) < 0)
-@@ -1254,6 +1274,7 @@
+@@ -1250,6 +1275,7 @@
          goto finally;
      Py_INCREF(IntHandler);
  
@@ -254,15 +253,15 @@
      Handlers[0].tripped = 0;
      for (i = 1; i < NSIG; i++) {
          void (*t)(int);
-@@ -1274,6 +1295,7 @@
-         Handlers[SIGINT].func = IntHandler;
+@@ -1269,6 +1295,7 @@
+         Py_SETREF(Handlers[SIGINT].func, IntHandler);
          old_siginthandler = PyOS_setsig(SIGINT, signal_handler);
      }
 +#endif
  
  #ifdef SIGHUP
      x = PyLong_FromLong(SIGHUP);
-@@ -1515,6 +1537,7 @@
+@@ -1510,6 +1537,7 @@
      return m;
  }
  
@@ -270,7 +269,7 @@
  static void
  finisignal(void)
  {
-@@ -1538,12 +1561,14 @@
+@@ -1533,12 +1561,14 @@
      Py_CLEAR(DefaultHandler);
      Py_CLEAR(IgnoreHandler);
  }
@@ -285,7 +284,7 @@
      int i;
      PyObject *f;
  
-@@ -1592,6 +1617,7 @@
+@@ -1587,6 +1617,7 @@
          }
      }
  
@@ -293,7 +292,7 @@
      return 0;
  }
  
-@@ -1602,7 +1628,9 @@
+@@ -1597,7 +1628,9 @@
  void
  PyErr_SetInterrupt(void)
  {
@@ -303,7 +302,7 @@
  }
  
  void
-@@ -1617,12 +1645,15 @@
+@@ -1612,12 +1645,15 @@
  void
  PyOS_FiniInterrupts(void)
  {
@@ -319,7 +318,7 @@
      if (Handlers[SIGINT].tripped) {
  #ifdef WITH_THREAD
          if (PyThread_get_thread_ident() != main_thread)
-@@ -1631,12 +1662,14 @@
+@@ -1626,12 +1662,14 @@
          Handlers[SIGINT].tripped = 0;
          return 1;
      }
@@ -334,7 +333,7 @@
      int i;
      if (!is_tripped)
          return;
-@@ -1644,6 +1677,7 @@
+@@ -1639,6 +1677,7 @@
      for (i = 1; i < NSIG; ++i) {
          Handlers[i].tripped = 0;
      }
@@ -344,7 +343,7 @@
  void
 --- Python/pylifecycle.c
 +++ Python/pylifecycle.c
-@@ -1452,6 +1452,7 @@
+@@ -1491,6 +1491,7 @@
  static void
  initsigs(void)
  {
@@ -352,7 +351,7 @@
  #ifdef SIGPIPE
      PyOS_setsig(SIGPIPE, SIG_IGN);
  #endif
-@@ -1461,6 +1462,7 @@
+@@ -1500,6 +1501,7 @@
  #ifdef SIGXFSZ
      PyOS_setsig(SIGXFSZ, SIG_IGN);
  #endif
@@ -360,7 +359,7 @@
      PyOS_InitInterrupts(); /* May imply initsignal() */
      if (PyErr_Occurred()) {
          Py_FatalError("Py_Initialize: can't import signal");
-@@ -1477,6 +1479,7 @@
+@@ -1516,6 +1518,7 @@
  void
  _Py_RestoreSignals(void)
  {
@@ -368,7 +367,7 @@
  #ifdef SIGPIPE
      PyOS_setsig(SIGPIPE, SIG_DFL);
  #endif
-@@ -1486,6 +1489,7 @@
+@@ -1525,6 +1528,7 @@
  #ifdef SIGXFSZ
      PyOS_setsig(SIGXFSZ, SIG_DFL);
  #endif
@@ -376,7 +375,7 @@
  }
  
  
-@@ -1518,7 +1522,7 @@
+@@ -1557,7 +1561,7 @@
      if (sigaction(sig, NULL, &context) == -1)
          return SIG_ERR;
      return context.sa_handler;
@@ -385,7 +384,7 @@
      PyOS_sighandler_t handler;
  /* Special signal handling for the secure CRT in Visual Studio 2005 */
  #if defined(_MSC_VER) && _MSC_VER >= 1400
-@@ -1564,7 +1568,7 @@
+@@ -1603,7 +1607,7 @@
      if (sigaction(sig, &context, &ocontext) == -1)
          return SIG_ERR;
      return ocontext.sa_handler;

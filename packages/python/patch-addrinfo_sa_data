@@ -1,6 +1,6 @@
 --- Modules/socketmodule.c
 +++ Modules/socketmodule.c
-@@ -1384,10 +1384,16 @@ makesockaddr(SOCKET_T sockfd, struct sockaddr *addr, size_t addrlen, int proto)
+@@ -1380,10 +1380,16 @@
      default:
          /* If we don't know the address family, don't raise an
             exception -- return it as an (int, bytes) tuple. */

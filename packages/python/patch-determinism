@@ -21,4 +21,3 @@
  
  /* XXX Only unix build process has been tested */
  #ifndef HGVERSION
-

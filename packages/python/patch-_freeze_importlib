@@ -1,6 +1,6 @@
 --- Programs/_freeze_importlib.c
 +++ Programs/_freeze_importlib.c
-@@ -29,7 +29,11 @@ const struct _frozen *PyImport_FrozenModules;
+@@ -32,7 +32,11 @@
  int
  main(int argc, char *argv[])
  {
@@ -12,7 +12,7 @@
      FILE *infile = NULL, *outfile = NULL;
      struct _Py_stat_struct status;
      size_t text_size, data_size, n;
-@@ -43,19 +52,31 @@ main(int argc, char *argv[])
+@@ -43,6 +47,7 @@
  
      PyImport_FrozenModules = _PyImport_FrozenModules;
  
@@ -20,7 +20,7 @@
      if (argc != 3) {
          fprintf(stderr, "need to specify input and output paths\n");
          return 2;
-     }
+@@ -50,12 +55,23 @@
      inpath = argv[1];
      outpath = argv[2];
      infile = fopen(inpath, "rb");
@@ -44,7 +44,7 @@
          goto error;
      }
      text_size = status.st_size;
-@@ -86,7 +103,11 @@ main(int argc, char *argv[])
+@@ -82,7 +98,11 @@
      /* Don't install importlib, since it could execute outdated bytecode. */
      _Py_InitializeEx_Private(1, 0);
  
@@ -56,7 +56,7 @@
          is_bootstrap = 0;
      }
  
-@@ -110,9 +131,17 @@ main(int argc, char *argv[])
+@@ -106,9 +126,17 @@
  
      /* Open the file in text mode. The hg checkout should be using the eol extension,
         which in turn should cause the EOL style match the C library's text mode */
@@ -74,7 +74,7 @@
          goto error;
      }
      fprintf(outfile, "%s\n", header);
-@@ -140,7 +165,11 @@ main(int argc, char *argv[])
+@@ -132,7 +160,11 @@
      Py_Finalize();
      if (outfile) {
          if (ferror(outfile)) {

@@ -8,14 +8,16 @@
  #include <grp.h>
  
  #include "clinic/grpmodule.c.h"
-@@ -242,3 +243,4 @@ PyInit_grp(void)
+@@ -253,3 +254,4 @@
      initialized = 1;
      return m;
  }
 +#endif /* HAVE_GRP_H */
 --- setup.py
 +++ setup.py
-@@ -644,5 +644,9 @@ class PyBuildExt(build_ext):
+@@ -669,7 +669,11 @@
+         # pwd(3)
+         exts.append( Extension('pwd', ['pwdmodule.c']) )
          # grp(3)
 -        exts.append( Extension('grp', ['grpmodule.c']) )
 +        if config_h_vars.get('HAVE_GRP_H', False):

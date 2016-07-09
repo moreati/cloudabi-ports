@@ -9,7 +9,7 @@
  PyAPI_FUNC(PyObject *) _Py_device_encoding(int);
  
  PyAPI_FUNC(wchar_t *) Py_DecodeLocale(
-@@ -48,11 +48,14 @@
+@@ -48,11 +50,14 @@
      struct _Py_stat_struct *status);
  #endif   /* Py_LIMITED_API */
  
@@ -24,7 +24,9 @@
  PyAPI_FUNC(int) _Py_open(
      const char *pathname,
      int flags);
-@@ -62,17 +59,20 @@
+@@ -60,8 +65,10 @@
+ PyAPI_FUNC(int) _Py_open_noraise(
+     const char *pathname,
      int flags);
 +#endif /* HAVE_OPEN */
  #endif
@@ -33,11 +35,7 @@
  PyAPI_FUNC(FILE *) _Py_wfopen(
      const wchar_t *path,
      const wchar_t *mode);
- 
- PyAPI_FUNC(FILE*) _Py_fopen(
-     const char *pathname,
-     const char *mode);
- 
+@@ -73,6 +80,7 @@
  PyAPI_FUNC(FILE*) _Py_fopen_obj(
      PyObject *path,
      const char *mode);
@@ -45,7 +43,7 @@
  
  PyAPI_FUNC(Py_ssize_t) _Py_read(
      int fd,
-@@ -103,9 +91,11 @@
+@@ -103,9 +111,11 @@
      size_t resolved_path_size);
  #endif
  
@@ -59,7 +57,7 @@
  PyAPI_FUNC(int) _Py_get_inheritable(int fd);
 --- Include/pyerrors.h
 +++ Include/pyerrors.h
-@@ -345,14 +345,16 @@
+@@ -345,6 +345,7 @@
      int lineno,
      int col_offset);
  #endif
@@ -67,8 +65,7 @@
  PyAPI_FUNC(PyObject *) PyErr_ProgramText(
      const char *filename,       /* decoded from the filesystem encoding */
      int lineno);
- #ifndef Py_LIMITED_API
- PyAPI_FUNC(PyObject *) PyErr_ProgramTextObject(
+@@ -353,6 +354,7 @@
      PyObject *filename,
      int lineno);
  #endif
@@ -76,24 +73,6 @@
  
  /* The following functions are used to create and modify unicode
     exceptions from C */
---- Python/errors.c
-+++ Python/errors.c
-@@ -1108,6 +1108,7 @@
-     return NULL;
- }
- 
-+#ifdef HAVE_OPEN
- PyObject *
- PyErr_ProgramText(const char *filename, int lineno)
- {
-@@ -1131,6 +1132,7 @@
-     }
-     return err_programtext(fp, lineno);
- }
-+#endif /* HAVE_OPEN */
- 
- #ifdef __cplusplus
- }
 --- Modules/_io/fileio.c
 +++ Modules/_io/fileio.c
 @@ -392,7 +392,11 @@
@@ -110,7 +89,7 @@
                       !(async_err = PyErr_CheckSignals()));
 --- Modules/posixmodule.c
 +++ Modules/posixmodule.c
-@@ -7777,7 +7777,11 @@
+@@ -7745,7 +7745,11 @@
              fd = openat(dir_fd, path->narrow, flags, mode);
          else
  #endif
@@ -122,9 +101,37 @@
          Py_END_ALLOW_THREADS
      } while (fd < 0 && errno == EINTR && !(async_err = PyErr_CheckSignals()));
      _Py_END_SUPPRESS_IPH
+--- Python/ast.c
++++ Python/ast.c
+@@ -659,7 +659,11 @@
+ {
+     PyObject *value, *errstr, *loc, *tmp;
+ 
++#ifdef HAVE_OPEN
+     loc = PyErr_ProgramTextObject(c->c_filename, LINENO(n));
++#else
++    loc = NULL;
++#endif
+     if (!loc) {
+         Py_INCREF(Py_None);
+         loc = Py_None;
+--- Python/compile.c
++++ Python/compile.c
+@@ -4275,7 +4275,11 @@
+     PyObject *loc;
+     PyObject *u = NULL, *v = NULL;
+ 
++#ifdef HAVE_OPEN
+     loc = PyErr_ProgramTextObject(c->c_filename, c->u->u_lineno);
++#else
++    loc = NULL;
++#endif
+     if (!loc) {
+         Py_INCREF(Py_None);
+         loc = Py_None;
 --- Python/errors.c
 +++ Python/errors.c
-@@ -1021,12 +1021,14 @@
+@@ -1020,12 +1020,14 @@
          if (_PyObject_SetAttrId(v, &PyId_filename, filename))
              PyErr_Clear();
  
@@ -139,37 +146,25 @@
      }
      if (_PyObject_SetAttrId(v, &PyId_offset, Py_None)) {
          PyErr_Clear();
---- Python/ast.c
-+++ Python/ast.c
-@@ -601,7 +601,11 @@
+@@ -1107,6 +1109,7 @@
+     return NULL;
+ }
+ 
++#ifdef HAVE_OPEN
+ PyObject *
+ PyErr_ProgramText(const char *filename, int lineno)
  {
-     PyObject *value, *errstr, *loc, *tmp;
+@@ -1130,6 +1133,7 @@
+     }
+     return err_programtext(fp, lineno);
+ }
++#endif /* HAVE_OPEN */
  
-+#ifdef HAVE_OPEN
-     loc = PyErr_ProgramTextObject(c->c_filename, LINENO(n));
-+#else
-+    loc = NULL;
-+#endif
-     if (!loc) {
-         Py_INCREF(Py_None);
-         loc = Py_None;
---- Python/compile.c
-+++ Python/compile.c
-@@ -4056,7 +4056,11 @@
-     PyObject *loc;
-     PyObject *u = NULL, *v = NULL;
- 
-+#ifdef HAVE_OPEN
-     loc = PyErr_ProgramTextObject(c->c_filename, c->u->u_lineno);
-+#else
-+    loc = NULL;
-+#endif
-     if (!loc) {
-         Py_INCREF(Py_None);
-         loc = Py_None;
+ #ifdef __cplusplus
+ }
 --- Python/fileutils.c
 +++ Python/fileutils.c
-@@ -704,6 +706,7 @@
+@@ -708,6 +708,7 @@
     Return 0 on success, -1 on _wstat() / stat() error, -2 if an exception was
     raised. */
  
@@ -177,7 +172,7 @@
  int
  _Py_stat(PyObject *path, struct stat *statbuf)
  {
-@@ -729,6 +732,7 @@
+@@ -733,6 +734,7 @@
      return ret;
  #endif
  }
@@ -185,7 +180,7 @@
  
  
  static int
-@@ -925,6 +929,7 @@
+@@ -942,6 +944,7 @@
      return set_inheritable(fd, inheritable, 1, atomic_flag_works);
  }
  
@@ -193,7 +188,7 @@
  static int
  _Py_open_impl(const char *pathname, int flags, int gil_held)
  {
-@@ -1143,6 +1148,7 @@
+@@ -1160,6 +1163,7 @@
      }
      return f;
  }
@@ -201,7 +196,7 @@
  
  /* Read count bytes from fd into buf.
  
-@@ -1429,6 +1435,7 @@
+@@ -1454,6 +1458,7 @@
     including the null character. Decode the path from the locale encoding.
     Return NULL on error. */
  
@@ -209,7 +204,7 @@
  wchar_t*
  _Py_wgetcwd(wchar_t *buf, size_t size)
  {
-@@ -1454,6 +1461,7 @@
+@@ -1479,6 +1484,7 @@
      return buf;
  #endif
  }
@@ -219,7 +214,7 @@
     non-inheritable. Return a new file descriptor on success, raise an OSError
 --- Python/sysmodule.c
 +++ Python/sysmodule.c
-@@ -1756,7 +1756,7 @@
+@@ -1753,7 +1753,7 @@
      crashing the Python interpreter. Catch this common mistake here
      and output a useful error message. Note that under MS Windows,
      the shell already prevents that. */

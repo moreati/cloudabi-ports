@@ -1,6 +1,6 @@
 --- Modules/Setup.dist
 +++ Modules/Setup.dist
-@@ -156,7 +156,7 @@ _symtable symtablemodule.c
+@@ -153,7 +153,7 @@
  # modules are to be built as shared libraries (see above for more
  # detail; also note that *static* reverses this effect):
  
@@ -9,7 +9,7 @@
  
  # GNU readline.  Unlike previous Python incarnations, GNU readline is
  # now incorporated in an optional module, configured in the Setup file
-@@ -171,39 +171,39 @@ _symtable symtablemodule.c
+@@ -168,39 +168,39 @@
  
  # Modules that should always be present (non UNIX dependent):
  
@@ -63,7 +63,7 @@
  
  # Socket module helper for SSL support; you must comment out the other
  # socket line above, and possibly edit the SSL variable:
-@@ -227,7 +227,7 @@ _symtable symtablemodule.c
+@@ -224,7 +224,7 @@
  #termios termios.c	# Steen Lumholt's termios module
  #resource resource.c	# Jeremy Hylton's rlimit interface
  
@@ -72,7 +72,7 @@
  
  # Multimedia modules -- off by default.
  # These don't work for 64-bit platforms!!!
-@@ -243,14 +243,14 @@ _symtable symtablemodule.c
+@@ -240,14 +240,14 @@
  # The _md5 module implements the RSA Data Security, Inc. MD5
  # Message-Digest Algorithm, described in RFC 1321.
  
@@ -91,7 +91,7 @@
  
  
  # The _tkinter module.
-@@ -335,10 +335,10 @@ _symtable symtablemodule.c
+@@ -332,10 +332,10 @@
  
  
  # Helper module for various ascii-encoders
@@ -104,20 +104,19 @@
  
  
  # Lee Busby's SIGFPE modules.
-@@ -379,14 +379,14 @@ _symtable symtablemodule.c
+@@ -376,14 +376,14 @@
  # Hye-Shik Chang's CJKCodecs
  
  # multibytecodec is required for all the other CJK codec modules
 -#_multibytecodec cjkcodecs/multibytecodec.c
--
++_multibytecodec cjkcodecs/multibytecodec.c
+ 
 -#_codecs_cn cjkcodecs/_codecs_cn.c
 -#_codecs_hk cjkcodecs/_codecs_hk.c
 -#_codecs_iso2022 cjkcodecs/_codecs_iso2022.c
 -#_codecs_jp cjkcodecs/_codecs_jp.c
 -#_codecs_kr cjkcodecs/_codecs_kr.c
 -#_codecs_tw cjkcodecs/_codecs_tw.c
-+_multibytecodec cjkcodecs/multibytecodec.c
-+
 +_codecs_cn cjkcodecs/_codecs_cn.c
 +_codecs_hk cjkcodecs/_codecs_hk.c
 +_codecs_iso2022 cjkcodecs/_codecs_iso2022.c

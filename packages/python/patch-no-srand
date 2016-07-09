@@ -10,7 +10,7 @@
  
  #include "ascii.h"
  #include "expat.h"
-@@ -693,8 +695,10 @@ static const XML_Char implicitContext[] = {
+@@ -693,8 +695,10 @@
  static unsigned long
  generate_hash_secret_salt(void)
  {

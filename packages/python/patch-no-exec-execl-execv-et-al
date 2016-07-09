@@ -1,6 +1,6 @@
 --- Modules/_posixsubprocess.c
 +++ Modules/_posixsubprocess.c
-@@ -491,9 +497,17 @@ child_exec(char *const exec_array[],
+@@ -499,9 +499,17 @@
      for (i = 0; exec_array[i] != NULL; ++i) {
          const char *executable = exec_array[i];
          if (envp) {

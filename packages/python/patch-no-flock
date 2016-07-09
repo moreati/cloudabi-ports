@@ -1,6 +1,6 @@
 --- Modules/clinic/fcntlmodule.c.h
 +++ Modules/clinic/fcntlmodule.c.h
-@@ -99,6 +99,9 @@ exit:
+@@ -101,6 +101,9 @@
      return return_value;
  }
  
@@ -10,7 +10,7 @@
  PyDoc_STRVAR(fcntl_flock__doc__,
  "flock($module, fd, operation, /)\n"
  "--\n"
-@@ -182,4 +185,7 @@ fcntl_lockf(PyModuleDef *module, PyObject *args)
+@@ -186,4 +189,7 @@
  exit:
      return return_value;
  }
@@ -20,7 +20,7 @@
  /*[clinic end generated code: output=b08537e9adc04ca2 input=a9049054013a1b77]*/
 --- Modules/fcntlmodule.c
 +++ Modules/fcntlmodule.c
-@@ -265,6 +265,9 @@ fcntl_ioctl_impl(PyModuleDef *module, int fd, unsigned int code,
+@@ -265,6 +265,9 @@
  #undef IOCTL_BUFSZ
  }
  
@@ -30,7 +30,7 @@
  /*[clinic input]
  fcntl.flock
  
-@@ -417,14 +420,23 @@ fcntl_lockf_impl(PyModuleDef *module, int fd, int code, PyObject *lenobj,
+@@ -417,14 +420,23 @@
      }
      Py_RETURN_NONE;
  }
@@ -54,7 +54,7 @@
      {NULL, NULL}  /* sentinel */
  };
  
-@@ -441,10 +453,18 @@ a file or socket object.");
+@@ -441,10 +453,18 @@
  static int
  all_ins(PyObject* m)
  {

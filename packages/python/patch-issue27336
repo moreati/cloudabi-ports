@@ -1,11 +1,6 @@
 --- Parser/pgenmain.c
 +++ Parser/pgenmain.c
-@@ -33,22 +33,23 @@ void Py_Exit(int) _Py_NO_RETURN;
- 
- void
- Py_Exit(int sts)
- {
-     exit(sts);
+@@ -38,12 +38,13 @@
  }
  
  #ifdef WITH_THREAD
@@ -21,19 +16,9 @@
  
  int
  main(int argc, char **argv)
- {
-     grammar *g;
-     FILE *fp;
-     char *filename, *graminit_h, *graminit_c;
- 
 --- Python/pylifecycle.c
 +++ Python/pylifecycle.c
-@@ -743,17 +743,19 @@ Py_NewInterpreter(void)
-     PyThreadState *tstate, *save_tstate;
-     PyObject *bimod, *sysmod;
- 
-     if (!initialized)
-         Py_FatalError("Py_NewInterpreter: call Py_Initialize first");
+@@ -748,7 +748,9 @@
  
      /* Issue #10915, #15751: The GIL API doesn't work with multiple
         interpreters: disable PyGILState_Check(). */
@@ -43,19 +28,9 @@
  
      interp = PyInterpreterState_New();
      if (interp == NULL)
-         return NULL;
- 
-     tstate = PyThreadState_New(interp);
-     if (tstate == NULL) {
-         PyInterpreterState_Delete(interp);
 --- Python/traceback.c
 +++ Python/traceback.c
-@@ -740,17 +740,17 @@ const char*
-         else {
-             interp = current_tstate->interp;
-         }
-     }
- #else
+@@ -745,7 +745,7 @@
      if (current_tstate == NULL) {
          /* Call _PyThreadState_UncheckedGet() instead of PyThreadState_Get()
             to not fail with a fatal error if the thread state is NULL. */
@@ -64,8 +39,3 @@
      }
  
      if (interp == NULL) {
-         if (current_tstate == NULL) {
-             /* We need the interpreter state to get Python threads */
-             return "unable to get the interpreter state";
-         }
-         interp = current_tstate->interp;

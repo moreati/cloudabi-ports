@@ -1,6 +1,6 @@
 --- Objects/exceptions.c
 +++ Objects/exceptions.c
-@@ -2620,7 +2620,9 @@
+@@ -2604,7 +2604,9 @@
      ADD_ERRNO(BlockingIOError, EWOULDBLOCK);
      POST_INIT(BrokenPipeError);
      ADD_ERRNO(BrokenPipeError, EPIPE);

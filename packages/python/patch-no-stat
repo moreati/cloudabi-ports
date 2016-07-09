@@ -1,6 +1,6 @@
 --- Modules/getpath.c
 +++ Modules/getpath.c
-@@ -144,8 +144,13 @@
+@@ -126,8 +126,13 @@
          errno = EINVAL;
          return -1;
      }
@@ -16,7 +16,7 @@
  
 --- Modules/posixmodule.c
 +++ Modules/posixmodule.c
-@@ -348,8 +348,12 @@
+@@ -362,8 +362,12 @@
  #       define FSTAT _Py_fstat_noraise
  #       define STRUCT_STAT struct _Py_stat_struct
  #else
@@ -29,7 +29,7 @@
  #       define FSTAT fstat
  #       define STRUCT_STAT struct stat
  #endif
-@@ -2141,7 +2145,11 @@
+@@ -2149,7 +2153,11 @@
                           follow_symlinks ? 0 : AT_SYMLINK_NOFOLLOW);
      else
  #endif
@@ -41,7 +41,7 @@
      Py_END_ALLOW_THREADS
  
      if (result != 0) {
-@@ -11522,9 +11521,17 @@ DirEntry_fetch_stat(DirEntry *self, int follow_symlinks)
+@@ -11510,9 +11518,17 @@
      path = PyBytes_AS_STRING(bytes);
  
      if (follow_symlinks)
@@ -61,7 +61,7 @@
      if (result != 0)
 --- Modules/zipimport.c
 +++ Modules/zipimport.c
-@@ -101,7 +100,12 @@ zipimporter_init(ZipImporter *self, PyObject *args, PyObject *kwds)
+@@ -100,7 +100,12 @@
          struct stat statbuf;
          int rv;
  

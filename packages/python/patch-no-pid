@@ -1,6 +1,6 @@
 --- Modules/clinic/posixmodule.c.h
 +++ Modules/clinic/posixmodule.c.h
-@@ -2268,6 +2270,7 @@
+@@ -2316,6 +2316,7 @@
  
  #endif /* defined(HAVE_GETGID) */
  
@@ -8,7 +8,7 @@
  PyDoc_STRVAR(os_getpid__doc__,
  "getpid($module, /)\n"
  "--\n"
-@@ -2285,6 +2288,7 @@
+@@ -2333,6 +2334,7 @@
  {
      return os_getpid_impl(module);
  }
@@ -18,8 +18,7 @@
  
 --- Modules/posixmodule.c
 +++ Modules/posixmodule.c
-@@ -6036,7 +6036,8 @@
- }
+@@ -6055,6 +6055,7 @@
  #endif /* HAVE_GETGID */
  
  
@@ -27,7 +26,7 @@
  /*[clinic input]
  os.getpid
  
-@@ -6049,6 +6049,7 @@
+@@ -6067,6 +6068,7 @@
  {
      return PyLong_FromPid(getpid());
  }
@@ -35,7 +34,7 @@
  
  #ifdef HAVE_GETGROUPLIST
  
-@@ -12314,7 +12314,9 @@
+@@ -12426,7 +12428,9 @@
      {"getgrouplist",    posix_getgrouplist, METH_VARARGS, posix_getgrouplist__doc__},
  #endif
      OS_GETGROUPS_METHODDEF
@@ -56,8 +55,8 @@
 +# endif
  #endif
  
- #ifdef HAVE_SIG_ATOMIC_T
-@@ -1216,7 +1218,9 @@
+ static volatile struct {
+@@ -1198,7 +1200,9 @@
  
  #ifdef WITH_THREAD
      main_thread = PyThread_get_thread_ident();
@@ -67,7 +66,7 @@
  #endif
  
      /* Create the module and add the functions */
-@@ -1688,7 +1692,9 @@
+@@ -1655,7 +1659,9 @@
      _PyGILState_Reinit();
      PyEval_ReInitThreads();
      main_thread = PyThread_get_thread_ident();

@@ -1,16 +1,6 @@
 --- Modules/posixmodule.c
 +++ Modules/posixmodule.c
-@@ -218,7 +218,9 @@
- #endif
- extern char *strerror(int);
- extern int link(const char *, const char *);
-+#ifdef HAVE_RENAME
- extern int rename(const char *, const char *);
-+#endif /* HAVE_RENAME */
- extern int stat(const char *, struct stat *);
- extern int unlink(const char *);
- #ifdef HAVE_SYMLINK
-@@ -4180,7 +4182,11 @@
+@@ -4164,7 +4164,11 @@
          result = renameat(src_dir_fd, src->narrow, dst_dir_fd, dst->narrow);
      else
  #endif

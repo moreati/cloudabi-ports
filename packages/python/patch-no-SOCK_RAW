@@ -1,6 +1,6 @@
 --- Modules/getaddrinfo.c
 +++ Modules/getaddrinfo.c
-@@ -305,12 +305,18 @@ getaddrinfo(const char*hostname, const char*servname,
+@@ -305,12 +305,18 @@
                  pai->ai_socktype = SOCK_STREAM;
                  break;
              default:
@@ -21,7 +21,7 @@
                  pai->ai_protocol != GAI_ANY)
 --- Modules/socketmodule.c
 +++ Modules/socketmodule.c
-@@ -6442,7 +6442,9 @@ PyInit__socket(void)
+@@ -6486,7 +6486,9 @@
      PyModule_AddIntMacro(m, SOCK_STREAM);
      PyModule_AddIntMacro(m, SOCK_DGRAM);
  /* We have incomplete socket support. */

@@ -1,6 +1,6 @@
 --- setup.py
 +++ setup.py
-@@ -1552,7 +1554,7 @@ class PyBuildExt(build_ext):
+@@ -1580,7 +1580,7 @@
          # End multiprocessing
  
          # Platform-specific libraries

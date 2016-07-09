@@ -1,6 +1,6 @@
 --- Makefile.pre.in
 +++ Makefile.pre.in
-@@ -756,7 +756,8 @@
+@@ -767,7 +767,8 @@
  
  Modules/grpmodule.o: $(srcdir)/Modules/grpmodule.c $(srcdir)/Modules/posixmodule.h
  
@@ -20,7 +20,7 @@
  #include <pwd.h>
  
  #include "clinic/pwdmodule.c.h"
-@@ -236,3 +237,4 @@
+@@ -244,3 +245,4 @@
      PyModule_AddObject(m, "struct_passwd", (PyObject *) &StructPwdType);
      return m;
  }
@@ -42,7 +42,7 @@
  _weakref _weakref.c		# weak references
 --- setup.py
 +++ setup.py
-@@ -640,7 +640,11 @@
+@@ -667,7 +667,11 @@
              libs = ['bsd']
          exts.append( Extension('fcntl', ['fcntlmodule.c'], libraries=libs) )
          # pwd(3)

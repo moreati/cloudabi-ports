@@ -9,7 +9,7 @@
  #include <sys/time.h>
  #include <sys/types.h>
  #include <rpc/rpc.h>
-@@ -469,3 +471,5 @@ PyInit_nis(void)
+@@ -465,3 +467,5 @@
          PyDict_SetItemString(d, "error", NisError);
      return m;
  }

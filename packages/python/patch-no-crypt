@@ -8,9 +8,8 @@
  #include <sys/types.h>
  
  /* Module crypt */
-@@ -63,3 +64,4 @@ PyInit__crypt(void)
+@@ -63,3 +64,4 @@
  {
      return PyModule_Create(&cryptmodule);
  }
 +#endif /* !defined(__CloudABI__) */
-

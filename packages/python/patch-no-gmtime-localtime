@@ -1,59 +1,3 @@
---- Modules/timemodule.c
-+++ Modules/timemodule.c
-@@ -339,7 +339,7 @@
-         return NULL;
- 
-     errno = 0;
--    local = gmtime(&when);
-+    local = gmtime_r(&when, &buf);
-     if (local == NULL) {
- #ifdef EINVAL
-         if (errno == 0)
-@@ -347,7 +347,6 @@
- #endif
-         return PyErr_SetFromErrno(PyExc_OSError);
-     }
--    buf = *local;
-     return tmtotuple(&buf);
- }
- 
-@@ -367,7 +366,7 @@
-     struct tm *local;
- 
-     assert (timep != NULL);
--    local = localtime(timep);
-+    local = localtime_r(timep, result);
-     if (local == NULL) {
-         /* unconvertible time */
- #ifdef EINVAL
-@@ -377,7 +376,6 @@
-         PyErr_SetFromErrno(PyExc_OSError);
-         return -1;
-     }
--    *result = *local;
-     return 0;
- }
- 
-@@ -1180,16 +1178,16 @@
-     {
- #define YEAR ((time_t)((365 * 24 + 6) * 3600))
-         time_t t;
--        struct tm *p;
-+        struct tm *p, tmbuf;
-         long janzone, julyzone;
-         char janname[10], julyname[10];
-         t = (time((time_t *)0) / YEAR) * YEAR;
--        p = localtime(&t);
-+        p = localtime_r(&t, &tmbuf);
-         janzone = -p->tm_gmtoff;
-         strncpy(janname, p->tm_zone ? p->tm_zone : "   ", 9);
-         janname[9] = '\0';
-         t += YEAR/2;
--        p = localtime(&t);
-+        p = localtime_r(&t, &tmbuf);
-         julyzone = -p->tm_gmtoff;
-         strncpy(julyname, p->tm_zone ? p->tm_zone : "   ", 9);
-         julyname[9] = '\0';
 --- Modules/_datetimemodule.c
 +++ Modules/_datetimemodule.c
 @@ -2456,17 +2456,17 @@
@@ -186,3 +130,59 @@
  #ifdef HAVE_STRUCT_TM_TM_ZONE
      zone = timep->tm_zone;
      delta = new_delta(0, timep->tm_gmtoff, 0, 1);
+--- Modules/timemodule.c
++++ Modules/timemodule.c
+@@ -339,7 +339,7 @@
+         return NULL;
+ 
+     errno = 0;
+-    local = gmtime(&when);
++    local = gmtime_r(&when, &buf);
+     if (local == NULL) {
+ #ifdef EINVAL
+         if (errno == 0)
+@@ -347,7 +347,6 @@
+ #endif
+         return PyErr_SetFromErrno(PyExc_OSError);
+     }
+-    buf = *local;
+     return tmtotuple(&buf);
+ }
+ 
+@@ -367,7 +366,7 @@
+     struct tm *local;
+ 
+     assert (timep != NULL);
+-    local = localtime(timep);
++    local = localtime_r(timep, result);
+     if (local == NULL) {
+         /* unconvertible time */
+ #ifdef EINVAL
+@@ -377,7 +376,6 @@
+         PyErr_SetFromErrno(PyExc_OSError);
+         return -1;
+     }
+-    *result = *local;
+     return 0;
+ }
+ 
+@@ -1180,16 +1178,16 @@
+     {
+ #define YEAR ((time_t)((365 * 24 + 6) * 3600))
+         time_t t;
+-        struct tm *p;
++        struct tm *p, tmbuf;
+         long janzone, julyzone;
+         char janname[10], julyname[10];
+         t = (time((time_t *)0) / YEAR) * YEAR;
+-        p = localtime(&t);
++        p = localtime_r(&t, &tmbuf);
+         janzone = -p->tm_gmtoff;
+         strncpy(janname, p->tm_zone ? p->tm_zone : "   ", 9);
+         janname[9] = '\0';
+         t += YEAR/2;
+-        p = localtime(&t);
++        p = localtime_r(&t, &tmbuf);
+         julyzone = -p->tm_gmtoff;
+         strncpy(julyname, p->tm_zone ? p->tm_zone : "   ", 9);
+         julyname[9] = '\0';

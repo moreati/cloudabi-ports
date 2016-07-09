@@ -1,16 +1,6 @@
 --- Modules/posixmodule.c
 +++ Modules/posixmodule.c
-@@ -203,7 +203,9 @@
- #endif
- extern int rmdir(const char *);
- #endif
-+#ifdef HAVE_CHMOD
- extern int chmod(const char *, mode_t);
-+#endif
- /*#ifdef HAVE_FCHMOD
- extern int fchmod(int, mode_t);
- #endif*/
-@@ -2878,7 +2880,11 @@
+@@ -2870,7 +2870,11 @@
      }
      else
  #endif

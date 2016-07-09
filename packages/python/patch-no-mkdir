@@ -1,18 +1,6 @@
 --- Modules/posixmodule.c
 +++ Modules/posixmodule.c
-@@ -189,9 +189,11 @@
- #if ( defined(__WATCOMC__) || defined(_MSC_VER) ) && !defined(__QNX__)
- extern int mkdir(const char *);
- #else
-+#ifdef HAVE_MKDIR
- extern int mkdir(const char *, mode_t);
- #endif
- #endif
-+#endif
- #if defined(__IBMC__) || defined(__IBMCPP__)
- extern int chdir(char *);
- extern int rmdir(char *);
-@@ -4022,7 +4024,11 @@
+@@ -4012,7 +4012,11 @@
  #if ( defined(__WATCOMC__) || defined(PYCC_VACPP) ) && !defined(__QNX__)
          result = mkdir(path->narrow);
  #else

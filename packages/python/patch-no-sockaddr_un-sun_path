@@ -1,6 +1,6 @@
 --- Modules/socketmodule.c
 +++ Modules/socketmodule.c
-@@ -1166,8 +1166,12 @@ makesockaddr(SOCKET_T sockfd, struct sockaddr *addr, size_t addrlen, int proto)
+@@ -1192,8 +1192,12 @@
          else
  #endif /* linux */
          {
@@ -13,7 +13,7 @@
          }
      }
  #endif /* AF_UNIX */
-@@ -1477,6 +1477,7 @@
+@@ -1495,6 +1499,7 @@
          else
  #endif /* linux */
          {
@@ -21,7 +21,8 @@
              /* regular NULL-terminated string */
              if ((size_t)path.len >= sizeof addr->sun_path) {
                  PyErr_SetString(PyExc_OSError,
-@@ -1486,10 +1486,13 @@
+@@ -1502,10 +1507,13 @@
+                 goto unix_out;
              }
              addr->sun_path[path.len] = 0;
 +#endif /* __CloudABI__ */
@@ -34,4 +35,3 @@
          retval = 1;
      unix_out:
          PyBuffer_Release(&path);
-         Py_DECREF(args);

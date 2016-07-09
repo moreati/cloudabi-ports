@@ -1,6 +1,6 @@
 --- Modules/_lsprof.c
 +++ Modules/_lsprof.c
-@@ -36,7 +36,9 @@ hpTimerUnit(void)
+@@ -36,7 +36,9 @@
  #error "This module requires gettimeofday() on non-Windows platforms!"
  #endif
  
@@ -21,7 +21,7 @@
  #include <sys/resource.h>
  #include <sys/time.h>
  #include <string.h>
-@@ -452,3 +453,5 @@ PyInit_resource(void)
+@@ -452,3 +455,5 @@
      initialized = 1;
      return m;
  }

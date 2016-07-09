@@ -1,17 +1,14 @@
 --- Python/sysmodule.c
 +++ Python/sysmodule.c
-@@ -1792,15 +1795,28 @@ _PySys_Init(void)
+@@ -1787,6 +1787,7 @@
+                         PyUnicode_FromString(Py_GetCopyright()));
      SET_SYS_FROM_STRING("platform",
                          PyUnicode_FromString(Py_GetPlatform()));
 +#ifndef __CloudABI__
      SET_SYS_FROM_STRING("executable",
                          PyUnicode_FromWideChar(
                                 Py_GetProgramFullPath(), -1));
-     SET_SYS_FROM_STRING("prefix",
-                         PyUnicode_FromWideChar(Py_GetPrefix(), -1));
-     SET_SYS_FROM_STRING("exec_prefix",
-                         PyUnicode_FromWideChar(Py_GetExecPrefix(), -1));
-     SET_SYS_FROM_STRING("base_prefix",
+@@ -1798,6 +1799,18 @@
                          PyUnicode_FromWideChar(Py_GetPrefix(), -1));
      SET_SYS_FROM_STRING("base_exec_prefix",
                          PyUnicode_FromWideChar(Py_GetExecPrefix(), -1));
@@ -29,3 +26,4 @@
 +#endif
      SET_SYS_FROM_STRING("maxsize",
                          PyLong_FromSsize_t(PY_SSIZE_T_MAX));
+     SET_SYS_FROM_STRING("float_info",

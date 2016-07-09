@@ -1,6 +1,6 @@
 --- Modules/clinic/posixmodule.c.h
 +++ Modules/clinic/posixmodule.c.h
-@@ -216,6 +216,7 @@
+@@ -220,6 +220,7 @@
  
  #endif /* defined(HAVE_CTERMID) */
  
@@ -8,7 +8,7 @@
  PyDoc_STRVAR(os_chdir__doc__,
  "chdir($module, /, path)\n"
  "--\n"
-@@ -250,6 +251,7 @@
+@@ -255,6 +256,7 @@
  
      return return_value;
  }
@@ -16,32 +16,9 @@
  
  #if defined(HAVE_FCHDIR)
  
---- Modules/_posixsubprocess.c
-+++ Modules/_posixsubprocess.c
-@@ -451,8 +455,10 @@ child_exec(char *const exec_array[],
-     if (errwrite != c2pwrite && errwrite != p2cread && errwrite > 2)
-         POSIX_CALL(close(errwrite));
- 
-+#ifdef HAVE_CHDIR
-     if (cwd)
-         POSIX_CALL(chdir(cwd));
-+#endif
- 
-     if (restore_signals)
-         _Py_RestoreSignals();
 --- Modules/posixmodule.c
 +++ Modules/posixmodule.c
-@@ -198,7 +198,9 @@
- extern int chdir(char *);
- extern int rmdir(char *);
- #else
-+#ifdef HAVE_CHDIR
- extern int chdir(const char *);
-+#endif
- extern int rmdir(const char *);
- #endif
- extern int chmod(const char *, mode_t);
-@@ -2726,7 +2728,11 @@
+@@ -2724,7 +2724,11 @@
          result = fchdir(path->fd);
      else
  #endif
@@ -53,3 +30,16 @@
  #endif
      Py_END_ALLOW_THREADS
  
+--- Modules/_posixsubprocess.c
++++ Modules/_posixsubprocess.c
+@@ -459,8 +459,10 @@
+     if (errwrite != c2pwrite && errwrite != p2cread && errwrite > 2)
+         POSIX_CALL(close(errwrite));
+ 
++#ifdef HAVE_CHDIR
+     if (cwd)
+         POSIX_CALL(chdir(cwd));
++#endif
+ 
+     if (restore_signals)
+         _Py_RestoreSignals();
