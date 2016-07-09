@@ -20,7 +20,7 @@ def build(ctx):
     hostbuild.make()
 
     build = srcdir.gnu_configure([
-        '--build=%s' % sysconfig.get_platform(),
+        '--build=%s' % sysconfig.get_config_var('HOST_GNU_TYPE'),
         '--disable-shared',
         '--without-ensurepip',
         '--with-pydebug',
