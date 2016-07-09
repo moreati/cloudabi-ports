@@ -3,7 +3,6 @@
 # This file is distributed under a 2-clause BSD license.
 # See the LICENSE file for details.
 
-import sysconfig
 
 def build(ctx):
     srcdir = ctx.extract('Python-3.6.0a2')
@@ -19,7 +18,7 @@ def build(ctx):
     hostbuild.make()
 
     build = srcdir.gnu_configure([
-        '--build=%s' % sysconfig.get_config_var('HOST_GNU_TYPE'),
+        '--build=%s' % ctx.host().gnu_triple(),
         '--disable-shared',
         '--without-ensurepip',
         '--with-pydebug',
