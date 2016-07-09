@@ -141,30 +141,6 @@
  
      x = PyLong_FromLong(CHAR_MAX);
      PyDict_SetItemString(d, "CHAR_MAX", x);
---- Modules/main.c
-+++ Modules/main.c
-@@ -547,8 +547,10 @@
-             Py_FatalError(
-                "not enough memory to copy PYTHONWARNINGS");
-         strcpy(buf, p);
-+#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
-         oldloc = _PyMem_RawStrdup(setlocale(LC_ALL, NULL));
-         setlocale(LC_ALL, "");
-+#endif
-         for (p = strtok(buf, ","); p != NULL; p = strtok(NULL, ",")) {
- #ifdef __APPLE__
-             /* Use utf-8 on Mac OS X */
-@@ -564,8 +566,10 @@
-             PySys_AddWarnOptionUnicode(unicode);
-             Py_DECREF(unicode);
-         }
-+#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
-         setlocale(LC_ALL, oldloc);
-         PyMem_RawFree(oldloc);
-+#endif
-         PyMem_RawFree(buf);
-     }
- #endif
 --- Programs/python.c
 +++ Programs/python.c
 @@ -22,7 +22,9 @@

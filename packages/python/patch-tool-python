@@ -203,6 +203,42 @@
  /* For Py_GetArgcArgv(); set by main() */
  static wchar_t **orig_argv;
  static int  orig_argc;
+--- Modules/main.c
++++ Modules/main.c
+@@ -542,6 +542,7 @@
+ #else
+     if ((p = Py_GETENV("PYTHONWARNINGS")) && *p != '\0') {
+         char *buf, *oldloc;
++        char *saveptr;
+         PyObject *unicode;
+ 
+         /* settle for strtok here as there's no one standard
+@@ -555,9 +556,13 @@
+             Py_FatalError(
+                "not enough memory to copy PYTHONWARNINGS");
+         strcpy(buf, p);
++#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
+         oldloc = _PyMem_RawStrdup(setlocale(LC_ALL, NULL));
+         setlocale(LC_ALL, "");
++#endif
+-        for (p = strtok(buf, ","); p != NULL; p = strtok(NULL, ",")) {
++        for (p = strtok_r(buf, ",", &saveptr);
++             p != NULL;
++             p = strtok_r(NULL, ",", &saveptr)) {
+ #ifdef __APPLE__
+             /* Use utf-8 on Mac OS X */
+             unicode = PyUnicode_FromString(p);
+@@ -564,8 +566,10 @@
+             PySys_AddWarnOptionUnicode(unicode);
+             Py_DECREF(unicode);
+         }
++#if defined(HAVE_SETLOCALE) && defined(LC_ALL)
+         setlocale(LC_ALL, oldloc);
+         PyMem_RawFree(oldloc);
++#endif
+         PyMem_RawFree(buf);
+     }
+ #endif
 --- Python/pylifecycle.c
 +++ Python/pylifecycle.c
 @@ -49,6 +49,11 @@ extern "C" {
