@@ -1,4 +1,5 @@
 # Copyright (c) 2015 Nuxi, https://nuxi.nl/
+# Copyright (c) 2016 Alex Willmer, alex@moreati.org.uk
 #
 # This file is distributed under a 2-clause BSD license.
 # See the LICENSE file for details.
@@ -46,7 +47,7 @@ package(
     name='python',
     version='3.6.0',
     homepage='https://www.python.org/',
-    maintainer='info@nuxi.nl',
+    maintainer='alex@moreati.org.uk',
     lib_depends={'c-runtime'},
     build_cmd=build,
 )
