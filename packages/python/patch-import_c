@@ -1,0 +1,25 @@
+--- Python/import.c
++++ Python/import.c
+@@ -996,10 +996,19 @@
+         if (importer != NULL)
+             break;
+ 
+-        if (!PyErr_ExceptionMatches(PyExc_ImportError)) {
++        if (PyErr_ExceptionMatches(PyExc_ImportError)) {
++            PyErr_Clear();
++        }
++        else if (PyErr_ExceptionMatches(PyExc_TypeError)) {
++            /* FIXME This was probably raised by zipimport.zipimporter, when
++                     it tried to interpret the file descriptor p as a unicode
++                     string. We don't check though.
++            */
++            PyErr_Clear();
++        }
++        else {
+             return NULL;
+         }
+-        PyErr_Clear();
+     }
+     if (importer == NULL) {
+         return Py_None;
+

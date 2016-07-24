@@ -525,7 +525,7 @@
  #define COPYRIGHT \
      "Type \"help\", \"copyright\", \"credits\" or \"license\" " \
      "for more information."
-@@ -32,6 +38,162 @@
+@@ -32,6 +38,193 @@
  extern "C" {
  #endif
  
@@ -533,7 +533,10 @@
 +
 +int stdlibfd;
 +
++static int RunModule(wchar_t *, int);
++static int RunMainFromImporterFd(int);
 +static int run_command(wchar_t *, PyCompilerFlags *);
++static int run_file(FILE *, const wchar_t *, PyCompilerFlags *);
 +
 +void
 +Py_ProgramMain(const argdata_t *ad)
@@ -541,8 +544,9 @@
 +    int c;
 +    int sts;
 +    wchar_t *command = NULL;
-+    wchar_t *filename = NULL;
++    int file_d = -1;
 +    wchar_t *module = NULL;
++    FILE *fp = NULL;
 +    char *p;
 +    int stdin_is_interactive = 0;
 +    int help = 0;
@@ -616,6 +620,10 @@
 +                                "unable to decode the 'module' argument\n");
 +            }
 +        }
++        else if (strcmp(keystr, "file") == 0) {
++            if (argdata_get_fd(val, &file_d) == 0) {
++            }
++        }
 +        else if (strcmp(keystr, "bytescompare") == 0) {
 +            Py_BytesWarningFlag++;
 +        }
@@ -659,7 +667,7 @@
 +    Py_XDECREF(warning_options);
 +
 +    if (!Py_QuietFlag && (Py_VerboseFlag ||
-+                        (command == NULL && filename == NULL &&
++                        (command == NULL && file_d == -1 &&
 +                         module == NULL && stdin_is_interactive))) {
 +        fprintf(stderr, "Python %s on %s\n",
 +            Py_GetVersion(), Py_GetPlatform());
@@ -669,6 +677,29 @@
 +
 +    if (command) {
 +        sts = run_command(command, &cf);
++        PyMem_RawFree(command);
++    }
++    else if (module) {
++        sts = (RunModule(module, 1) != 0);
++    }
++    else {
++        sts = -1;
++        if (file_d != -1) {
++            sts = RunMainFromImporterFd(file_d);
++        }
++
++        if (sts == -1 && file_d != -1) {
++            fp = fdopen(file_d, "r");
++            if (fp == NULL) {
++                int err = errno;
++                fprintf(stderr, "python: can't open file %d: [Errno %d] %s\n",
++                    file_d, err, strerror(err));
++                exit(2);
++            }
++        }
++
++        if (sts == -1)
++            sts = run_file(fp, NULL, &cf);
 +    }
 +
 +    if (Py_FinalizeEx() < 0) {
@@ -688,6 +719,42 @@
  /* For Py_GetArgcArgv(); set by main() */
  static wchar_t **orig_argv;
  static int  orig_argc;
+@@ -395,12 +424,11 @@
+ }
+ 
+ static int
+-RunMainFromImporter(wchar_t *filename)
++_RunMainFromArgv0(PyObject *argv0)
+ {
+-    PyObject *argv0 = NULL, *importer, *sys_path;
++    PyObject *importer, *sys_path;
+     int sts;
+
+-    argv0 = PyUnicode_FromWideChar(filename, wcslen(filename));
+     if (argv0 == NULL)
+         goto error;
+ 
+@@ -477,6 +463,20 @@
+ }
+ 
+ static int
++RunMainFromImporter(wchar_t *filename)
++{
++    PyObject *argv0 = PyUnicode_FromWideChar(filename, wcslen(filename));
++    return _RunMainFromArgv0(argv0);
++}
++
++static int
++RunMainFromImporterFd(int fd)
++{
++    PyObject *argv0 = Py_BuildValue("i", fd);
++    return _RunMainFromArgv0(argv0);
++}
++
++static int
+ run_command(wchar_t *command, PyCompilerFlags *cf)
+ {
+     PyObject *unicode, *bytes;
 @@ -546,6 +708,7 @@
  #else
      if ((p = Py_GETENV("PYTHONWARNINGS")) && *p != '\0') {
